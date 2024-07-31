@@ -1,0 +1,53 @@
+# 数据源配置
+spring:
+  datasource:
+    #druid数据源配置
+    druid:
+      url: jdbc:mysql://localhost:3306/qq_data?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root
+      password: 123456
+      # 初始化连接池大小
+      initialSize: 5
+      # 最小连接数
+      minIdle: 5
+      # 最大连接数
+      maxActive: 40
+      # 配置过滤器，过滤掉静态文件
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: /druid/*,*.js,*.css,*.gif,*.jpg,*.bmp,*.png,*.ico
+      # 配置可视化控制台页面
+      stat-view-servlet:
+        enabled: true
+        # 访问德鲁伊监控页面的地址
+        url-pattern: /druid/*
+        # IP白名单 没有配置或者为空 则允许所有访问
+        allow:
+        # IP黑名单 若白名单也存在 则优先使用
+        deny:
+        # 禁用重置按钮
+        reset-enable: true
+        # 登录所用的用户名与密码
+        login-username: admin
+        login-password: 123456
+
+
+# mybatis-plus 配置
+mybatis-plus:
+  configuration:
+    # 开启驼峰映射
+    map-underscore-to-camel-case: true
+    # 打印 sql 日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # id 自增类型配置
+      id-type: ASSIGN_ID
+      # 逻辑删除字段配置
+      logic-delete-field: deleted
+      logic-not-delete-value: 0
+      logic-delete-value: 1
+    # 控制台 mybatis-plus 标记
+    banner: true

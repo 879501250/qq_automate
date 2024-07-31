@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qq.automate.mapper.FlightHistoryPriceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.qq.automate.entity.FlightHistoryPrice">
+        <id column="query_date" property="queryDate" />
+        <id column="depart" property="depart" />
+        <id column="depart_date" property="departDate" />
+        <id column="return" property="return" />
+        <id column="type" property="type" />
+        <result column="depart_week" property="departWeek" />
+        <result column="depart_flight_no" property="departFlightNo" />
+        <result column="depart_time" property="departTime" />
+        <result column="return_date" property="returnDate" />
+        <result column="return_week" property="returnWeek" />
+        <result column="return_flight_no" property="returnFlightNo" />
+        <result column="return_time" property="returnTime" />
+        <result column="price" property="price" />
+        <result column="history_price" property="historyPrice" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+</mapper>
