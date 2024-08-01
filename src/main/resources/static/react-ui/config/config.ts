@@ -6,9 +6,14 @@ import proxy from './proxy';
 
 import routes from './routes';
 
+// 当前运行环境名称
 const { REACT_APP_ENV = 'dev' } = process.env;
 
 export default defineConfig({
+  /**
+   * 浏览器标签页上的图标
+   */
+  favicons: ['/favicon.ico'],
   /**
    * @name 开启 hash 模式
    * @description 让 build 之后的产物包含 hash 后缀。通常用于增量发布和避免浏览器加载缓存。
@@ -77,7 +82,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Ant Design Pro',
+  title: 'QQ Automate',
   layout: {
     locale: true,
     ...defaultSettings,
