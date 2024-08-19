@@ -7,6 +7,9 @@ const Settings: ProLayoutProps & {
   pwa?: boolean;
   logo?: string;
 } = {
+  menu: {
+    locale: false,  // 关闭国际化菜单
+  },
   navTheme: 'light',
   // 拂晓蓝
   colorPrimary: '#1890ff',

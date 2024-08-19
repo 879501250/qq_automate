@@ -12,6 +12,26 @@
  */
 export default [
   {
+    path: '/',
+    redirect: '/yiguan/list',
+  },
+  {
+    component: '404',
+    path: '/*',
+  },
+  {
+    path: '/yiguan',
+    name: '一罐',
+    icon: 'hugeicons:milk-bottle',
+    routes: [
+      {
+        path: '/yiguan/list',
+        name: '罐子集合',
+        component: './yiguan/list',
+      },
+    ],
+  },
+  {
     path: '/user',
     layout: false,
     routes: [
@@ -256,13 +276,5 @@ export default [
         component: './account/settings',
       },
     ],
-  },
-  {
-    path: '/',
-    redirect: '/dashboard/analysis',
-  },
-  {
-    component: '404',
-    path: '/*',
   },
 ];

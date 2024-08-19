@@ -19,7 +19,14 @@ export default defineConfig({
    * @description 让 build 之后的产物包含 hash 后缀。通常用于增量发布和避免浏览器加载缓存。
    * @doc https://umijs.org/docs/api/config#hash
    */
-  hash: true,
+  hash: false,
+
+  icons: { autoInstall: {} },
+
+  /**
+   * 设置路由 history 类型。
+   */
+  history: {type: 'hash'},
 
   /**
    * @name 兼容性设置
@@ -52,7 +59,7 @@ export default defineConfig({
    * @description 如果对国际化没有要求，打开之后能减少js的包大小
    * @doc https://umijs.org/docs/api/config#ignoremomentlocale
    */
-  ignoreMomentLocale: true,
+  ignoreMomentLocale: false,
   /**
    * @name 代理配置
    * @description 可以让你的本地服务器代理到你的服务器上，这样你就可以访问服务器的数据了
@@ -84,7 +91,8 @@ export default defineConfig({
    */
   title: 'QQ Automate',
   layout: {
-    locale: true,
+    // 是否开启国际化菜单
+    locale: false,
     ...defaultSettings,
   },
   /**

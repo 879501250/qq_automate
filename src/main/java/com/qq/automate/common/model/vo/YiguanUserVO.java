@@ -19,4 +19,6 @@ public class YiguanUserVO {
     private String nickname;
     // ip
     private String ipLocation;
+    // 头像
+    private String avatar;
 }
