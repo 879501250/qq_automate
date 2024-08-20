@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Service
 public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, YiguanSUser> implements YiguanSUserService {
@@ -22,8 +20,8 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
     private static Map<String, YiguanSUser> suserCache = new HashMap<>();
 
     @Override
-    public Result<List<YiguanSUser>> listSUsers() {
-        return Result.success(yiguanSUserMapper.listAll());
+    public Result listSUsers() {
+        return Result.success().data("susers", yiguanSUserMapper.listAll());
     }
 
     private void initSUserCache() {
@@ -77,7 +75,7 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
             }
             yiguanSUserMapper.updateById(sUser);
         }
-        return Result.success(sUser);
+        return Result.success().data("suser", sUser);
     }
 
 }

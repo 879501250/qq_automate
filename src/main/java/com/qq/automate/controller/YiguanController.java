@@ -4,16 +4,13 @@ import com.qq.automate.common.model.vo.YiguanDiaryVO;
 import com.qq.automate.common.model.vo.YiguanListVO;
 import com.qq.automate.common.model.vo.YiguanMoodVO;
 import com.qq.automate.common.result.Result;
-import com.qq.automate.entity.YiguanMood;
 import com.qq.automate.entity.YiguanSUser;
 import com.qq.automate.service.YiguanMoodService;
 import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpRequest;
 import java.util.List;
 
 /**
@@ -35,17 +32,17 @@ public class YiguanController {
     private YiguanSUserService yiguanSUserService;
 
     @GetMapping("/listAllMood")
-    public Result<List<YiguanMoodVO>> listAllMood() {
+    public Result listAllMood() {
         return yiguanMoodService.listAllMood();
     }
 
     @GetMapping("/listNew")
-    public Result<List<YiguanDiaryVO>> listNew(YiguanListVO yiguanListVO) {
+    public Result listNew(YiguanListVO yiguanListVO) {
         return yiguanService.listNew(yiguanListVO);
     }
 
     @GetMapping("/listSUsers")
-    public Result<List<YiguanSUser>> listSUsers() {
+    public Result listSUsers() {
         return yiguanSUserService.listSUsers();
     }
 

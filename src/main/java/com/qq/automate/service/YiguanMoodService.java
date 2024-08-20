@@ -18,5 +18,5 @@ import java.util.List;
 public interface YiguanMoodService extends IService<YiguanMood> {
 
     // 获取所有情绪之海信息
-    Result<List<YiguanMoodVO>> listAllMood();
+    Result listAllMood();
 }

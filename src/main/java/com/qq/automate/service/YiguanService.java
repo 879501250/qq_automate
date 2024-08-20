@@ -8,6 +8,6 @@ import com.qq.automate.entity.YiguanSUser;
 import java.util.List;
 
 public interface YiguanService {
-    Result<List<YiguanDiaryVO>> listNew(YiguanListVO yiguanListVO);
+    Result listNew(YiguanListVO yiguanListVO);
 
 }

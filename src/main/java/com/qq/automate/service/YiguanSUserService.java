@@ -7,7 +7,7 @@ import com.qq.automate.entity.YiguanSUser;
 import java.util.List;
 
 public interface YiguanSUserService extends IService<YiguanSUser> {
-    Result<List<YiguanSUser>> listSUsers();
+    Result listSUsers();
 
     Result addSUser(YiguanSUser yiguanSUser);
 }

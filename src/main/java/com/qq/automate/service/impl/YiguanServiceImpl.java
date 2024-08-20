@@ -23,7 +23,7 @@ public class YiguanServiceImpl implements YiguanService {
 
 
     @Override
-    public Result<List<YiguanDiaryVO>> listNew(YiguanListVO yiguanListVO) {
+    public Result listNew(YiguanListVO yiguanListVO) {
         // 参数校验
 
         String result = HttpRequest.get(YiguanConstant.YIGUAN_LIST_NEW_URL).execute().body();
@@ -31,6 +31,7 @@ public class YiguanServiceImpl implements YiguanService {
         JSONArray datas = jsonObject.getJSONArray("data");
         ArrayList<YiguanDiaryVO> list = new ArrayList<>(datas.size());
         Long lastScore = yiguanListVO.getLastScore();
+        Long temp = lastScore;
         for (int i = datas.size() - 1; i >= 0; i--) {
             JSONObject data = datas.get(i, JSONObject.class);
             // 判断时间
@@ -68,11 +69,12 @@ public class YiguanServiceImpl implements YiguanService {
                         photos.set(j, data.getByPath("photos.[" + j + "].url", String.class));
                     }
                     list.add(diaryVO);
+                    System.out.println(diaryVO.getCreateTime());
                 }
+                temp = score - 1;
             }
         }
-
-        return Result.success(list);
+        return Result.success().data("diaries", list).data("lastScore", temp);
     }
 
     /**

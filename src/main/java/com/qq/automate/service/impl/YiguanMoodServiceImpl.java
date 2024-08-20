@@ -26,7 +26,7 @@ public class YiguanMoodServiceImpl extends ServiceImpl<YiguanMoodMapper, YiguanM
     private YiguanMoodMapper yiguanMoodMapper;
 
     @Override
-    public Result<List<YiguanMoodVO>> listAllMood() {
-        return Result.success(yiguanMoodMapper.findAll());
+    public Result listAllMood() {
+        return Result.success().data("moods", yiguanMoodMapper.findAll());
     }
 }
