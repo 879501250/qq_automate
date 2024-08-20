@@ -9,12 +9,11 @@ import com.qq.automate.entity.YiguanSUser;
 import com.qq.automate.service.YiguanMoodService;
 import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpRequest;
 import java.util.List;
 
 /**
@@ -51,7 +50,7 @@ public class YiguanController {
     }
 
     @PostMapping("/addSUser")
-    public Result addSUser(YiguanSUser yiguanSUser) {
+    public Result addSUser(@RequestBody YiguanSUser yiguanSUser) {
         return yiguanSUserService.addSUser(yiguanSUser);
     }
 }

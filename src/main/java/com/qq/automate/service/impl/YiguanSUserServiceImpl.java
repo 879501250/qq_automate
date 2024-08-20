@@ -38,45 +38,45 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
             initSUserCache();
         }
         YiguanSUser sUser = suserCache.get(yiguanSUser.getUid());
-        // if (sUser == null) {
-        //     sUser = yiguanSUser;
-        //     suserCache.put(yiguanSUser.getUid(), sUser);
-        //     yiguanSUserMapper.insert(yiguanSUser);
-        // } else {
-        //     // 添加专辑 id
-        //     String albumIds = sUser.getAlbumIds();
-        //     if (albumIds == null || albumIds.isEmpty()) {
-        //         sUser.setAlbumIds(yiguanSUser.getAlbumIds());
-        //     } else {
-        //         if (yiguanSUser.getAlbumIds() != null && !albumIds.contains(yiguanSUser.getAlbumIds())) {
-        //             sUser.setAlbumIds(albumIds + "," + yiguanSUser.getAlbumIds());
-        //         }
-        //     }
-        //     // 添加图片
-        //     String photos = sUser.getPhotos();
-        //     if (photos == null || photos.isEmpty()) {
-        //         sUser.setPhotos(yiguanSUser.getPhotos());
-        //     } else {
-        //         if (yiguanSUser.getPhotos() != null) {
-        //             for (String s : yiguanSUser.getPhotos().split(",")) {
-        //                 if (!s.isEmpty() && !photos.contains(s)) {
-        //                     photos += "," + s;
-        //                 }
-        //             }
-        //             sUser.setPhotos(photos);
-        //         }
-        //     }
-        //     // 添加罐头内容
-        //     String diaryText = sUser.getDiaryText();
-        //     if (diaryText == null || diaryText.isEmpty()) {
-        //         sUser.setAlbumIds(yiguanSUser.getDiaryText());
-        //     } else {
-        //         if (yiguanSUser.getDiaryText() != null && !yiguanSUser.getDiaryText().isEmpty()) {
-        //             sUser.setDiaryText(diaryText + "\n" + yiguanSUser.getDiaryText());
-        //         }
-        //     }
-        //     yiguanSUserMapper.updateById(sUser);
-        // }
+        if (sUser == null) {
+            sUser = yiguanSUser;
+            suserCache.put(yiguanSUser.getUid(), sUser);
+            yiguanSUserMapper.insert(yiguanSUser);
+        } else {
+            // 添加专辑 id
+            String albumIds = sUser.getAlbumIds();
+            if (albumIds == null || albumIds.isEmpty()) {
+                sUser.setAlbumIds(yiguanSUser.getAlbumIds());
+            } else {
+                if (yiguanSUser.getAlbumIds() != null && !albumIds.contains(yiguanSUser.getAlbumIds())) {
+                    sUser.setAlbumIds(albumIds + "," + yiguanSUser.getAlbumIds());
+                }
+            }
+            // 添加图片
+            String photos = sUser.getPhotos();
+            if (photos == null || photos.isEmpty()) {
+                sUser.setPhotos(yiguanSUser.getPhotos());
+            } else {
+                if (yiguanSUser.getPhotos() != null) {
+                    for (String s : yiguanSUser.getPhotos().split(",")) {
+                        if (!s.isEmpty() && !photos.contains(s)) {
+                            photos += "," + s;
+                        }
+                    }
+                    sUser.setPhotos(photos);
+                }
+            }
+            // 添加罐头内容
+            String diaryText = sUser.getDiaryText();
+            if (diaryText == null || diaryText.isEmpty()) {
+                sUser.setDiaryText(yiguanSUser.getDiaryText());
+            } else {
+                if (yiguanSUser.getDiaryText() != null && !yiguanSUser.getDiaryText().isEmpty()) {
+                    sUser.setDiaryText(diaryText + "\n" + yiguanSUser.getDiaryText());
+                }
+            }
+            yiguanSUserMapper.updateById(sUser);
+        }
         return Result.success(sUser);
     }
 
