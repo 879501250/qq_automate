@@ -28,8 +28,18 @@ export type Album = {
   createTime: number;
 };
 
-export type ListParams = {
-  lastScore: number;
+export type QueryParams = {
+  realQueryMoods: string[];
+  shadowQueryMoods: string[];
+  ipLocations: string[];
+  contents: string[];
+}
+
+export type Mood = {
+  id: string;
+  name: string;
+  realEnable: number;
+  shadowEnable: number;
 }
 
 

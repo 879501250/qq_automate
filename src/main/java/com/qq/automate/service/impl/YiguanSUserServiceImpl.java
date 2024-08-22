@@ -26,16 +26,23 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
 
     private void initSUserCache() {
         for (YiguanSUser yiguanSUser : yiguanSUserMapper.listAll()) {
-            suserCache.put(yiguanSUser.getUid(), yiguanSUser);
+            // 可能出现一个人有多个账号的情况
+            for (String uid : yiguanSUser.getUid().split(",")) {
+                suserCache.put(uid, yiguanSUser);
+            }
         }
+    }
+
+    private YiguanSUser getSUserById(String uid) {
+        if (suserCache.isEmpty()) {
+            initSUserCache();
+        }
+        return suserCache.get(uid);
     }
 
     @Override
     public Result addSUser(YiguanSUser yiguanSUser) {
-        if (suserCache.isEmpty()) {
-            initSUserCache();
-        }
-        YiguanSUser sUser = suserCache.get(yiguanSUser.getUid());
+        YiguanSUser sUser = getSUserById(yiguanSUser.getUid());
         if (sUser == null) {
             sUser = yiguanSUser;
             suserCache.put(yiguanSUser.getUid(), sUser);
@@ -70,12 +77,17 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
                 sUser.setDiaryText(yiguanSUser.getDiaryText());
             } else {
                 if (yiguanSUser.getDiaryText() != null && !yiguanSUser.getDiaryText().isEmpty()) {
-                    sUser.setDiaryText(diaryText + "\n" + yiguanSUser.getDiaryText());
+                    sUser.setDiaryText(diaryText + "\n\n" + yiguanSUser.getDiaryText());
                 }
             }
             yiguanSUserMapper.updateById(sUser);
         }
         return Result.success().data("suser", sUser);
+    }
+
+    @Override
+    public Result isSUser(String uid) {
+        return Result.success().data(getSUserById(uid) != null);
     }
 
 }

@@ -10,5 +10,5 @@ public interface YiguanSUserMapper extends BaseMapper<YiguanSUser> {
 
     // 查询所有的用户信息
     @Select("select * from yiguan_suser")
-    public List<YiguanSUser> listAll();// 返回的值是一个User类型的集合
+    List<YiguanSUser> listAll();// 返回的值是一个User类型的集合
 }

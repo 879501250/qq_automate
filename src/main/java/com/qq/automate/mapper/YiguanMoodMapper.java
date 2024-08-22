@@ -16,6 +16,6 @@ import java.util.List;
  * @since 2024-07-19 13:58:07
  */
 public interface YiguanMoodMapper extends BaseMapper<YiguanMood> {
-    @Select("SELECT id,name FROM yiguan_mood")
+    @Select("SELECT id,name,real_enable,shadow_enable FROM yiguan_mood ORDER BY sort")
     List<YiguanMoodVO> findAll();
 }

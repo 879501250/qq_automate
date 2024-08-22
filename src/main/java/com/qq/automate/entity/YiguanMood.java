@@ -39,6 +39,24 @@ public class YiguanMood implements Serializable {
     private String id;
 
     /**
+     * 默认是否查询这片海下真身用户发的罐头，0：不查询，1：查询
+     */
+    @TableField("real_enable")
+    private int realEnable;
+
+    /**
+     * 默认是否查询这片海下分身用户发的罐头，0：不查询，1：查询
+     */
+    @TableField("shadow_enable")
+    private int shadowEnable;
+
+    /**
+     * 排序
+     */
+    @TableField("sort")
+    private int sort;
+
+    /**
      * 更新时间
      */
     @TableField("update_time")

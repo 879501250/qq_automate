@@ -19,7 +19,7 @@ public class Result {
     // 提示信息
     private String message;
     // 返回数据
-    private Map<String, Object> data = new HashMap<>();
+    private Object data = null;
 
     // 私有化构造器
     private Result() {
@@ -63,12 +63,25 @@ public class Result {
     }
 
     public Result data(String key, Object value) {
-        this.data.put(key, value);
+        if (data == null) {
+            data = new HashMap<>();
+        } else if (!(data instanceof HashMap<?, ?>)) {
+            throw new RuntimeException("data 中已有数据，无法重复赋值~");
+        }
+        ((Map) this.data).put(key, value);
         return this;
     }
 
     public Result data(Map<String, Object> map) {
         this.setData(map);
+        return this;
+    }
+
+    public Result data(Object o) {
+        if (data != null) {
+            throw new RuntimeException("data 中已有数据，无法重复赋值~");
+        }
+        this.data = o;
         return this;
     }
 }

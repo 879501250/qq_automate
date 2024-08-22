@@ -2,11 +2,13 @@ import { AvatarDropdown, AvatarName, Footer, Question, SelectLang } from '@/comp
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
-import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
+import type { RequestConfig, RunTimeLayoutConfig, Request } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import { listAllMood } from './services/yiguan/api';
+import { getChinaProvinces } from './services/global/api';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -16,6 +18,8 @@ const loginPath = '/user/login';
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
+  moods?: API.Mood[];
+  chinaProvinces?: string[];
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
@@ -40,8 +44,39 @@ export async function getInitialState(): Promise<{
   //     settings: defaultSettings as Partial<LayoutSettings>,
   //   };
   // }
+
+  let moods: API.Mood[] = [];
+  await listAllMood({
+    skipErrorHandler: true,
+  }).then(function (res) {
+    if (res.code == 1) {
+      moods = res.data.moods;
+    }
+  })
+  let chinaProvinces: string[] = [];
+  await getChinaProvinces({
+    skipErrorHandler: true,
+  }).then(function (res) {
+    if (res.code == 1) {
+      chinaProvinces = res.data;
+    }
+  })
+  // const moods = async () => {
+  //   try {
+  //     const res = await listAllMood({
+  //       skipErrorHandler: true,
+  //     });
+  //     return res.data;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   return undefined;
+  // };
+
   return {
     fetchUserInfo,
+    moods,
+    chinaProvinces,
     settings: defaultSettings as Partial<LayoutSettings>,
   };
 }
@@ -91,11 +126,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
     links: isDev
       ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-            <LinkOutlined />
-            <span>OpenAPI 文档</span>
-          </Link>,
-        ]
+        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+          <LinkOutlined />
+          <span>OpenAPI 文档</span>
+        </Link>,
+      ]
       : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面

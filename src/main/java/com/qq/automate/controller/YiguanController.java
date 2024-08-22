@@ -1,8 +1,6 @@
 package com.qq.automate.controller;
 
-import com.qq.automate.common.model.vo.YiguanDiaryVO;
-import com.qq.automate.common.model.vo.YiguanListVO;
-import com.qq.automate.common.model.vo.YiguanMoodVO;
+import com.qq.automate.common.model.vo.YiguanQueryListParamsVO;
 import com.qq.automate.common.result.Result;
 import com.qq.automate.entity.YiguanSUser;
 import com.qq.automate.service.YiguanMoodService;
@@ -10,8 +8,6 @@ import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * <p>
@@ -37,8 +33,13 @@ public class YiguanController {
     }
 
     @GetMapping("/listNew")
-    public Result listNew(YiguanListVO yiguanListVO) {
-        return yiguanService.listNew(yiguanListVO);
+    public Result listNew(Long lastScore) {
+        return yiguanService.listNew(lastScore);
+    }
+
+    @PostMapping("/setQueryListParams")
+    public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO){
+        return yiguanService.setQueryListParams(yiguanQueryListParamsVO);
     }
 
     @GetMapping("/listSUsers")

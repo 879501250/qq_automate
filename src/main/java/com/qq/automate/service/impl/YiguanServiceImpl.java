@@ -1,17 +1,14 @@
 package com.qq.automate.service.impl;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.qq.automate.common.constant.YiguanConstant;
 import com.qq.automate.common.model.vo.YiguanDiaryVO;
-import com.qq.automate.common.model.vo.YiguanListVO;
+import com.qq.automate.common.model.vo.YiguanQueryListParamsVO;
 import com.qq.automate.common.model.vo.YiguanUserVO;
 import com.qq.automate.common.result.Result;
-import com.qq.automate.entity.YiguanSUser;
 import com.qq.automate.service.YiguanService;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +20,13 @@ public class YiguanServiceImpl implements YiguanService {
 
 
     @Override
-    public Result listNew(YiguanListVO yiguanListVO) {
-        // 参数校验
-
+    public Result listNew(Long lastScore) {
         String result = HttpRequest.get(YiguanConstant.YIGUAN_LIST_NEW_URL).execute().body();
         JSONObject jsonObject = JSONUtil.parseObj(result);
         JSONArray datas = jsonObject.getJSONArray("data");
         ArrayList<YiguanDiaryVO> list = new ArrayList<>(datas.size());
-        Long lastScore = yiguanListVO.getLastScore();
         Long temp = lastScore;
+        YiguanDiaryVO diaryVO;
         for (int i = datas.size() - 1; i >= 0; i--) {
             JSONObject data = datas.get(i, JSONObject.class);
             // 判断时间
@@ -40,45 +35,75 @@ public class YiguanServiceImpl implements YiguanService {
                 // 判断性别
                 Integer gender = data.getByPath("user.gender", Integer.class);
                 if (2 == gender) {
-                    // 内容太多了，现在只看真身或者带专辑的罐头
-                    Boolean isReal = data.getByPath("user.isReal", Boolean.class);
-                    String mood = data.getByPath("mood.name", String.class);
-                    if (Boolean.FALSE.equals(isReal)) {
-                        JSONObject album = data.getJSONObject("album");
-                        if (album == null) {
-                            if (!mood.equals("此刻") && !mood.equals("秘密") && !mood.equals("求撩")) {
-                                continue;
-                            }
+                    diaryVO = filterDiary(data);
+                    if (diaryVO != null) {
+                        YiguanUserVO user = diaryVO.getUser();
+                        if (user.getId() == null) {
+                            user.setAge(data.getStr("age"));
                         }
+                        if (diaryVO.getAlbum() != null) {
+                            user.setId(data.getByPath("album.uid", String.class));
+                        }
+                        if (user.getAvatar() != null) {
+                            user.setAvatar(YiguanConstant.YIGUAN_PHOTO_URL + data.getByPath("user.avatar.key", String.class));
+                        }
+                        if (diaryVO.getIpLocation() == null) {
+                            diaryVO.setIpLocation(getIP(diaryVO.getId()));
+                        }
+                        List<String> photos = diaryVO.getPhotos();
+                        for (int j = 0; j < photos.size(); j++) {
+                            photos.set(j, data.getByPath("photos.[" + j + "].url", String.class));
+                        }
+                        list.add(diaryVO);
                     }
-                    YiguanDiaryVO diaryVO = JSONUtil.toBean(data, YiguanDiaryVO.class);
-                    diaryVO.setMood(mood);
-                    YiguanUserVO user = diaryVO.getUser();
-                    if (user.getId() == null) {
-                        user.setAge(data.getStr("age"));
-                    }
-                    if (diaryVO.getAlbum() != null) {
-                        user.setId(data.getByPath("album.uid", String.class));
-                    }
-                    if (user.getAvatar() != null) {
-                        user.setAvatar(YiguanConstant.YIGUAN_PHOTO_URL + data.getByPath("user.avatar.key", String.class));
-                    }
-                    diaryVO.setIpLocation(getIP(diaryVO.getId()));
-                    List<String> photos = diaryVO.getPhotos();
-                    for (int j = 0; j < photos.size(); j++) {
-                        photos.set(j, data.getByPath("photos.[" + j + "].url", String.class));
-                    }
-                    list.add(diaryVO);
-                    System.out.println(diaryVO.getCreateTime());
                 }
-                temp = score - 1;
             }
+            temp = score;
         }
         return Result.success().data("diaries", list).data("lastScore", temp);
     }
 
+    // 对罐头按查询条件进行筛选
+    private YiguanDiaryVO filterDiary(JSONObject data) {
+        YiguanDiaryVO diaryVO = JSONUtil.toBean(data, YiguanDiaryVO.class);
+        Boolean isReal = data.getByPath("user.isReal", Boolean.class);
+        if (queryListParams == null) {
+            // 内容太多了，现在只看真身或者带专辑的罐头
+            if (Boolean.FALSE.equals(isReal) && data.getJSONObject("album") == null) {
+                // 不是真身，也不包含专辑就不看
+                diaryVO = null;
+            } else {
+                diaryVO.setMood(data.getByPath("mood.name", String.class));
+            }
+        } else {
+            String mood = data.getByPath("mood.name", String.class);
+            diaryVO.setMood(mood);
+            if (isReal || data.getJSONObject("album") == null) {
+                if (!queryListParams.vaildateShadowMoods(diaryVO)) {
+                    diaryVO = null;
+                }
+            } else {
+                if (!queryListParams.vaildateShadowMoods(diaryVO) && !queryListParams.vaildateContent(diaryVO)) {
+                    diaryVO.setIpLocation(getIP(diaryVO.getId()));
+                    if (!queryListParams.vaildateIp(diaryVO)) {
+                        diaryVO = null;
+                    }
+                }
+            }
+        }
+        return diaryVO;
+    }
+
+    private static YiguanQueryListParamsVO queryListParams;
+
+    @Override
+    public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO) {
+        queryListParams = yiguanQueryListParamsVO;
+        return Result.success().data(queryListParams);
+    }
+
     /**
-     * 根据罐头 id 获取 ip
+     * 根据罐头 id 获取 ip，没查到就为空字符串
      *
      * @param id
      * @return

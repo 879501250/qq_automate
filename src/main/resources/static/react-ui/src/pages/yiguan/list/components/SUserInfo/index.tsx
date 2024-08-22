@@ -5,6 +5,7 @@ import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
 import { ModalForm, ProFormText, ProForm, ProFormTextArea, ProFormCheckbox } from '@ant-design/pro-components';
 
+// const url = 'http://localhost:8001';
 const url = '';
 
 type SUserType = {

@@ -10,4 +10,6 @@ public interface YiguanSUserService extends IService<YiguanSUser> {
     Result listSUsers();
 
     Result addSUser(YiguanSUser yiguanSUser);
+
+    Result isSUser(String uid);
 }

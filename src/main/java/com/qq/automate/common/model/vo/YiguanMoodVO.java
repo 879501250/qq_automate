@@ -13,4 +13,8 @@ public class YiguanMoodVO {
     private String name;
     // id
     private String id;
+    // 默认是否查询真身用户发的罐头
+    private int realEnable;
+    // 默认是否查询分身用户发的罐头
+    private int shadowEnable;
 }

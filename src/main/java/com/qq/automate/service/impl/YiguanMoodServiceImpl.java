@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,8 +26,17 @@ public class YiguanMoodServiceImpl extends ServiceImpl<YiguanMoodMapper, YiguanM
     @Autowired
     private YiguanMoodMapper yiguanMoodMapper;
 
+    private List<YiguanMoodVO> moodCache;
+
+    private List<YiguanMoodVO> getMoodCache() {
+        if (moodCache == null) {
+            moodCache = yiguanMoodMapper.findAll();
+        }
+        return moodCache;
+    }
+
     @Override
     public Result listAllMood() {
-        return Result.success().data("moods", yiguanMoodMapper.findAll());
+        return Result.success().data("moods", getMoodCache());
     }
 }
