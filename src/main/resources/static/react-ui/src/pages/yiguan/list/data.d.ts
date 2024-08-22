@@ -8,6 +8,7 @@ export interface Diary {
   ipLocation: string;
   user: User;
   album: Album;
+  isSUser: boolean;
 }
 
 export type User = {

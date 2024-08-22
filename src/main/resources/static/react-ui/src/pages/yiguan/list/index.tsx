@@ -311,8 +311,10 @@ const Diaries: FC = () => {
                   description={
                     <span>
                       <Tag>#{index}</Tag>
+                      {diary.isSUser && <Tag>S</Tag>}
                       <Tag>{diary.mood}</Tag>
                       {diary.user.age && <Tag>{diary.user.age}</Tag>}
+                      {diary.ipLocation && <Tag>{diary.ipLocation}</Tag>}
                       {diary.ipLocation && <Tag>{diary.ipLocation}</Tag>}
                     </span>
                   }

@@ -9,7 +9,8 @@ import {
     ProFormDigitRange,
 } from '@ant-design/pro-components';
 
-const url = 'http://localhost:8001';
+// const url = 'http://localhost:8001';
+const url = '';
 
 interface ExportFormProps {
     diaryList: Diary[];

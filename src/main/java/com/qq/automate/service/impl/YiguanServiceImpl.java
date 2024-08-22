@@ -9,7 +9,9 @@ import com.qq.automate.common.model.vo.YiguanDiaryVO;
 import com.qq.automate.common.model.vo.YiguanQueryListParamsVO;
 import com.qq.automate.common.model.vo.YiguanUserVO;
 import com.qq.automate.common.result.Result;
+import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +19,9 @@ import java.util.List;
 
 @Service
 public class YiguanServiceImpl implements YiguanService {
+
+    @Autowired
+    private YiguanSUserService yiguanSUserService;
 
 
     @Override
@@ -78,8 +83,19 @@ public class YiguanServiceImpl implements YiguanService {
         } else {
             String mood = data.getByPath("mood.name", String.class);
             diaryVO.setMood(mood);
-            if (isReal || data.getJSONObject("album") == null) {
-                if (!queryListParams.vaildateShadowMoods(diaryVO)) {
+            if (isReal || data.getJSONObject("album") != null) {
+                if (isReal) {
+                    if (Boolean.TRUE.equals(yiguanSUserService.isSUser(diaryVO.getUser().getId()).getData())) {
+                        diaryVO.setIsSUser(true);
+                    }
+                } else {
+                    if (Boolean.TRUE.equals(
+                            yiguanSUserService.isSUser(data.getByPath("album.uid", String.class)).getData())) {
+                        diaryVO.setIsSUser(true);
+                    }
+                }
+                if (!Boolean.TRUE.equals(diaryVO.getIsSUser())
+                        && !queryListParams.vaildateShadowMoods(diaryVO)) {
                     diaryVO = null;
                 }
             } else {

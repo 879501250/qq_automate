@@ -29,4 +29,6 @@ public class YiguanDiaryVO {
     private YiguanUserVO user;
     // 专辑信息
     private YiguanAlbumVO album;
+    // 是否是 suser
+    private Boolean isSUser;
 }
