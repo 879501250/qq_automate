@@ -7,7 +7,7 @@ import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import { listAllMood } from './services/yiguan/api';
+import { listAllMood, getYgt } from './services/yiguan/api';
 import { getChinaProvinces } from './services/global/api';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -19,9 +19,11 @@ export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   moods?: API.Mood[];
+  yiguanYgt?: string;
   chinaProvinces?: string[];
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  refreshYiguanYgt?: () => Promise<string>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -52,7 +54,7 @@ export async function getInitialState(): Promise<{
     if (res.code == 1) {
       moods = res.data.moods;
     }
-  })
+  });
   let chinaProvinces: string[] = [];
   await getChinaProvinces({
     skipErrorHandler: true,
@@ -60,7 +62,29 @@ export async function getInitialState(): Promise<{
     if (res.code == 1) {
       chinaProvinces = res.data;
     }
-  })
+  });
+  const refreshYiguanYgt = async () => {
+    try {
+      const res = await getYgt({
+        skipErrorHandler: true,
+        params: { 'refresh': true, },
+      });
+      console.log("最新 ygt：" + res.data);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+    return undefined;
+  };
+  let yiguanYgt: string = "";
+  await getYgt({
+    skipErrorHandler: true,
+    params: { 'refresh': false, },
+  }).then(function (res) {
+    if (res.code == 1) {
+      yiguanYgt = res.data;
+    }
+  });
   // const moods = async () => {
   //   try {
   //     const res = await listAllMood({
@@ -75,7 +99,9 @@ export async function getInitialState(): Promise<{
 
   return {
     fetchUserInfo,
+    refreshYiguanYgt,
     moods,
+    yiguanYgt,
     chinaProvinces,
     settings: defaultSettings as Partial<LayoutSettings>,
   };

@@ -26,6 +26,9 @@ public class YiguanServiceImpl implements YiguanService {
 
     @Override
     public Result listNew(Long lastScore) {
+        if (lastScore == null) {
+            lastScore = 0L;
+        }
         String result = HttpRequest.get(YiguanConstant.YIGUAN_LIST_NEW_URL).execute().body();
         JSONObject jsonObject = JSONUtil.parseObj(result);
         JSONArray datas = jsonObject.getJSONArray("data");
@@ -62,8 +65,8 @@ public class YiguanServiceImpl implements YiguanService {
                         list.add(diaryVO);
                     }
                 }
+                temp = Math.max(temp, score);
             }
-            temp = score;
         }
         return Result.success().data("diaries", list).data("lastScore", temp);
     }
@@ -95,7 +98,7 @@ public class YiguanServiceImpl implements YiguanService {
                     }
                 }
                 if (!Boolean.TRUE.equals(diaryVO.getIsSUser())
-                        && !queryListParams.vaildateShadowMoods(diaryVO)) {
+                        && !queryListParams.vaildateRealMoods(diaryVO)) {
                     diaryVO = null;
                 }
             } else {
@@ -116,6 +119,21 @@ public class YiguanServiceImpl implements YiguanService {
     public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO) {
         queryListParams = yiguanQueryListParamsVO;
         return Result.success().data(queryListParams);
+    }
+
+    // 用户凭证
+    private static String ygt = null;
+
+    @Override
+    public Result getYgt(Boolean refresh) {
+        if (Boolean.TRUE.equals(refresh) || ygt == null) {
+            refreshYgt();
+        }
+        return Result.success().data(ygt);
+    }
+
+    private void refreshYgt() {
+        ygt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjg1MzUzMDQsImV4cCI6MTcyNTg3NzEwNH0.9zCm6FJ2_OyDUAacDkPj3J05fgZ5Yl9VgcRp0SxCfo8";
     }
 
     /**

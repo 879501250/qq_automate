@@ -6,7 +6,7 @@ import { request } from '@umijs/max';
 import {
     DrawerForm,
     ProFormCheckbox,
-    ProFormDigitRange,
+    ProFormDigit,
 } from '@ant-design/pro-components';
 
 // const url = 'http://localhost:8001';
@@ -18,7 +18,7 @@ interface ExportFormProps {
 }
 
 type ExprotParams = {
-    indexRange: number[];
+    index: number;
     onlyReal: boolean;
 };
 
@@ -27,8 +27,8 @@ const ExportForm: React.FC<ExportFormProps> = ({ diaryList, removeDiaryList }) =
     const [form] = Form.useForm<ExprotParams>();
 
     // 导出指定范围的罐头
-    const exportDiary = (min: number, max: number, onlyReal: boolean) => {
-        let data = diaryList.slice(min, max);
+    const exportDiary = (index: number, onlyReal: boolean) => {
+        let data = diaryList.slice(index);
         if (onlyReal) {
             data = data.filter((diary: Diary) => diary.user.id);
         }
@@ -48,7 +48,7 @@ const ExportForm: React.FC<ExportFormProps> = ({ diaryList, removeDiaryList }) =
 
     return (
         <DrawerForm<ExprotParams>
-            title="导出列表"
+            title="导出最新罐头列表"
             //   resize={{
             //     onResize() {
             //       console.log('resize!');
@@ -58,7 +58,7 @@ const ExportForm: React.FC<ExportFormProps> = ({ diaryList, removeDiaryList }) =
             //   }}
             form={form}
             initialValues={{
-                indexRange: [0, diaryList.length],
+                index: 0,
                 onlyReal: false,
             }}
             trigger={
@@ -87,31 +87,19 @@ const ExportForm: React.FC<ExportFormProps> = ({ diaryList, removeDiaryList }) =
             }}
             //   submitTimeout={2000}
             onFinish={async (values) => {
-                let min = 0;
-                let max = diaryList.length;
-                if (values.indexRange) {
-                    if (values.indexRange[1]) {
-                        max = Math.min(max, values.indexRange[1]);
-                    }
-                    if (values.indexRange[0]) {
-                        if (values.indexRange[0] >= 0 && values.indexRange[0] < max) {
-                            min = values.indexRange[0];
-                        }
-                    }
-                }
-                exportDiary(min, max, values.onlyReal);
-                removeDiaryList(max);
+                exportDiary(values.index, values.onlyReal);
+                removeDiaryList(diaryList.length);
                 return true;
             }}
         >
             <span>当前总数：{diaryList.length}</span>
-            <ProFormDigitRange
-                label="导出数据范围"
-                name="indexRange"
-                separator="-"
-                placeholder={['最小值', '最大值']}
-                tooltip="索引从0开始"
-            // separatorWidth={60}
+            <ProFormDigit
+                name="index"
+
+                label="从当前索引开始导出"
+                max={diaryList.length - 1}
+                fieldProps={{ precision: 0, changeOnWheel: true }}
+                tooltip="索引从 0 开始，最大不超过列表总数"
             />
             <ProFormCheckbox name="onlyReal" >
                 是否仅包含真身

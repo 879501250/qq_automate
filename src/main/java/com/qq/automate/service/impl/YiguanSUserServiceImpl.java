@@ -33,7 +33,7 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
         }
     }
 
-    private YiguanSUser getSUserById(String uid) {
+    private YiguanSUser getSUser(String uid) {
         if (suserCache.isEmpty()) {
             initSUserCache();
         }
@@ -42,7 +42,7 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
 
     @Override
     public Result addSUser(YiguanSUser yiguanSUser) {
-        YiguanSUser sUser = getSUserById(yiguanSUser.getUid());
+        YiguanSUser sUser = getSUser(yiguanSUser.getUid());
         if (sUser == null) {
             sUser = yiguanSUser;
             suserCache.put(yiguanSUser.getUid(), sUser);
@@ -87,7 +87,16 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
 
     @Override
     public Result isSUser(String uid) {
-        return Result.success().data(getSUserById(uid) != null);
+        return Result.success().data(getSUser(uid) != null);
+    }
+
+    @Override
+    public Result getSUserById(String uid) {
+        YiguanSUser sUser = getSUser(uid);
+        if (sUser == null) {
+            return Result.error().message("未找到用户[" + uid + "]~");
+        }
+        return Result.success().data(sUser);
     }
 
 }

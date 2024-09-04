@@ -11,7 +11,7 @@ type PhotoCarouselProps = {
     };
 };
 
-const PhotoCarousel: React.FC<{ photos?: string[] }> = ({ photos }) => {
+const PhotoCarousel: React.FC<{ photos?: any[] }> = ({ photos }) => {
     // 确保photos是一个数组，否则在map函数中会出错  
     const carouselItems = photos ? photos.map((photo, index) => (
         <div key={index} style={{ position: 'relative', overflow: 'hidden', width: '100%', }}>

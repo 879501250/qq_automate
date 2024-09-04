@@ -14,3 +14,11 @@ export async function listAllMood(options?: { [key: string]: any }) {
 }
 
 
+
+/** 查询一罐登录凭证 */
+export async function getYgt(options?: { [key: string]: any }) {
+    return request(url + '/yiguan/getYgt', {
+        method: 'GET',
+        ...(options || {}),
+    });
+}

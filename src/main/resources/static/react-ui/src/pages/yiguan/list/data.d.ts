@@ -1,7 +1,7 @@
 export interface Diary {
   id: string;
   text: string;
-  photos: string[];
+  photos: any[] | string[];
   createTime: number;
   mood: string;
   score: string;
@@ -22,19 +22,13 @@ export type User = {
 
 export type Album = {
   id: string;
-  title: string;
-  photo: string;
-  diaryNum: number;
-  followNum: number;
-  createTime: number;
+  title?: string;
+  photo?: string;
+  diaryNum?: number;
+  followNum?: number;
+  createTime?: number;
 };
 
-export type QueryParams = {
-  realQueryMoods: string[];
-  shadowQueryMoods: string[];
-  ipLocations: string[];
-  contents: string[];
-}
 
 export type Mood = {
   id: string;
@@ -43,7 +37,12 @@ export type Mood = {
   shadowEnable: number;
 }
 
-
+type SUser = {
+  uid: string;
+  albumIds?: string;
+  diaryText?: string;
+  photos?: string;
+};
 
 
 

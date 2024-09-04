@@ -7,4 +7,6 @@ public interface YiguanService {
     Result listNew(Long lastScore);
 
     Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO);
+
+    Result getYgt(Boolean refresh);
 }
