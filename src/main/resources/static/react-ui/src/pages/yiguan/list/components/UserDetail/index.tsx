@@ -149,9 +149,20 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                 {title}
             </a>
             <Modal
-                style={{ maxWidth: '90%', width: '500px' }}
+                width={'80%'}
                 open={open}
-                title={userInfo?.nickname}
+                title={
+                    <Tooltip
+                        title={
+                            userInfo?.bgImg &&
+                            <div style={{ width: '250px', height: '250px' }}>
+                                <PhotoCarousel photos={[photoUrl + userInfo?.bgImg.key]} />
+                            </div>
+                        }
+                    >
+                        {userInfo?.nickname}
+                    </Tooltip>
+                }
                 onCancel={handleCancel}
 
                 footer={(_, { OkBtn, CancelBtn }) => (
@@ -161,16 +172,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                 <Card loading={load} bordered={false} >
                     <Row>
                         <Col flex={4}>
-                            <Tooltip
-                                title={
-                                    userInfo?.bgImg &&
-                                    <div style={{ width: '250px', height: '250px' }}>
-                                        <PhotoCarousel photos={[photoUrl + userInfo?.bgImg.key]} />
-                                    </div>
-                                }
-                            >
-                                <Avatar src={photoUrl + userInfo?.avatar.key} size={120} />
-                            </Tooltip>
+                            <Avatar src={photoUrl + userInfo?.avatar.key} size={120} />
                         </Col>
                         <Col flex={10}>
                             <div>

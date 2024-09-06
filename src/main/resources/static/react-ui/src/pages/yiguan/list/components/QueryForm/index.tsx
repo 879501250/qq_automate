@@ -9,6 +9,7 @@ import {
     Button,
     InputNumber,
     Upload,
+    Switch,
 } from 'antd';
 import { Mood, Diary } from '../../data';
 import StandardFormRow from '../StandardFormRow';
@@ -21,6 +22,7 @@ type QueryParams = {
     shadowQueryMoods: string[];
     ipLocations: string[];
     contents: string[];
+    enableShadow: boolean;
 }
 
 interface QueryFormProps {
@@ -33,8 +35,8 @@ interface QueryFormProps {
 
 const FormItem = Form.Item;
 
-const url = 'http://localhost:8001';
-// const url = '';
+// const url = 'http://localhost:8001';
+const url = '';
 
 const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryList, time, setTime }) => {
 
@@ -44,6 +46,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
 
 
     const [selectedIpLocations, setSelectedIpLocations] = useState<string[]>(["全部"]);
+    const [enableShadow, setEnableShadow] = useState<boolean>(true);
 
     const ipLocations: string[] = ["全部", "海外"].concat(initialState?.chinaProvinces || []);
     const filteredIps = ipLocations.filter((o) => {
@@ -60,6 +63,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
                 .map((mood: Mood) => mood.name),
         ipLocations: ['上海', '浙江'],
         contents: ['上海', '浙江'],
+        enableShadow: enableShadow,
     };
 
     const [queryParams, setQueryParams] = useState<QueryParams>(initialQueryParams);
@@ -74,8 +78,6 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
             // }
         });
     }, [queryParams]);
-
-
 
     function loadDiary(file: any) {
         const reader = new FileReader();
@@ -100,7 +102,14 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
                     initialValues={initialQueryParams}
                     onValuesChange={
                         (changeValues, values) => {
-                            setQueryParams(values);
+                            const copy = { ...queryParams }; 
+                            Object.keys(changeValues).forEach(key => {
+                                if (copy.hasOwnProperty(key)) {
+                                    copy[key as keyof QueryParams] = changeValues[key];
+                                }
+                            })
+                            console.log(copy);
+                            setQueryParams(copy);
                         }}
                 >
                     <StandardFormRow title="真身查询" block style={{ paddingBottom: 11 }}>
@@ -114,41 +123,50 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
                             </TagSelect>
                         </FormItem>
                     </StandardFormRow>
-                    <StandardFormRow title="分身查询" block style={{ paddingBottom: 11 }}>
-                        <FormItem name="shadowQueryMoods">
-                            <TagSelect expandable>
-                                {(initialState?.moods || []).map((mood) => (
-                                    <TagSelect.Option value={mood.name!} key={mood.name}>
-                                        {mood.name}
-                                    </TagSelect.Option>
-                                ))}
-                            </TagSelect>
-                        </FormItem>
+                    <StandardFormRow title="是否查询分身" grid>
+                        <Form.Item name="enableShadow" valuePropName="checked">
+                            <Switch checkedChildren="是" unCheckedChildren="否" onChange={setEnableShadow} />
+                        </Form.Item>
                     </StandardFormRow>
-                    <StandardFormRow title="分身地区" grid>
-                        <FormItem name="ipLocations" noStyle>
-                            <Select
-                                mode="multiple"
-                                placeholder="选择地区"
-                                style={{ minWidth: '6rem' }}
-                                value={selectedIpLocations}
-                                onChange={setSelectedIpLocations}
-                                options={filteredIps.map((item) => ({
-                                    value: item,
-                                    label: item,
-                                }))}
-                            />
-                        </FormItem>
-                    </StandardFormRow>
-                    <StandardFormRow title="分身内容" grid>
-                        <FormItem name="contents" noStyle>
-                            <Select
-                                mode="tags"
-                                style={{ width: '100%' }}
-                                placeholder="所包含的内容"
-                            />
-                        </FormItem>
-                    </StandardFormRow>
+                    {enableShadow &&
+                        <div>
+                            <StandardFormRow title="分身查询" block style={{ paddingBottom: 11 }}>
+                                <FormItem name="shadowQueryMoods">
+                                    <TagSelect expandable>
+                                        {(initialState?.moods || []).map((mood) => (
+                                            <TagSelect.Option value={mood.name!} key={mood.name}>
+                                                {mood.name}
+                                            </TagSelect.Option>
+                                        ))}
+                                    </TagSelect>
+                                </FormItem>
+                            </StandardFormRow>
+                            <StandardFormRow title="分身地区" grid>
+                                <FormItem name="ipLocations" noStyle>
+                                    <Select
+                                        mode="multiple"
+                                        placeholder="选择地区"
+                                        style={{ minWidth: '6rem' }}
+                                        value={selectedIpLocations}
+                                        onChange={setSelectedIpLocations}
+                                        options={filteredIps.map((item) => ({
+                                            value: item,
+                                            label: item,
+                                        }))}
+                                    />
+                                </FormItem>
+                            </StandardFormRow>
+                            <StandardFormRow title="分身内容" grid>
+                                <FormItem name="contents" noStyle>
+                                    <Select
+                                        mode="tags"
+                                        style={{ width: '100%' }}
+                                        placeholder="所包含的内容"
+                                    />
+                                </FormItem>
+                            </StandardFormRow>
+                        </div>
+                    }
                     <StandardFormRow title="其它选项" grid last>
                         <span>当前总数：{diaryList.length}</span>
                         <SyncOutlined spin style={{ color: '#1677ff' }} />

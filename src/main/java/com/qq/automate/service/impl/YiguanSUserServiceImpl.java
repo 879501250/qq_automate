@@ -77,7 +77,7 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
                 sUser.setDiaryText(yiguanSUser.getDiaryText());
             } else {
                 if (yiguanSUser.getDiaryText() != null && !yiguanSUser.getDiaryText().isEmpty()) {
-                    sUser.setDiaryText(diaryText + "\n\n" + yiguanSUser.getDiaryText());
+                    sUser.setDiaryText(diaryText + "&#10;&#10;&#10;" + yiguanSUser.getDiaryText());
                 }
             }
             yiguanSUserMapper.updateById(sUser);

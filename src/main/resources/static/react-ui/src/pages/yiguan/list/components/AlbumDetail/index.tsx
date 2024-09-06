@@ -88,7 +88,7 @@ const AlbumDetail: React.FC<{ album: Album, title: string }> = ({ album, title }
         <>
             <Tooltip
                 title={
-                    <div style={{ width: '300px', height: '250px' }}>
+                    <div style={{ width: '250px', height: '250px' }}>
                         <PhotoCarousel photos={[album.photo]} />
                     </div>
                 }
@@ -100,9 +100,19 @@ const AlbumDetail: React.FC<{ album: Album, title: string }> = ({ album, title }
                 </Button>
             </Tooltip>
             <Modal
-                style={{ maxWidth: '90%', width: '500px' }}
+                width={'80%'}
                 open={open}
-                title={album.title}
+                title={
+                    <Tooltip
+                        title={
+                            <div style={{ width: '250px', height: '250px' }}>
+                                <PhotoCarousel photos={[album.photo]} />
+                            </div>
+                        }
+                    >
+                        {albumDetail.title}
+                    </Tooltip>
+                }
                 onCancel={handleCancel}
                 footer={(_, { OkBtn, CancelBtn }) => (
                     <></>

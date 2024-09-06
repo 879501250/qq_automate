@@ -101,13 +101,15 @@ public class YiguanServiceImpl implements YiguanService {
                         && !queryListParams.vaildateRealMoods(diaryVO)) {
                     diaryVO = null;
                 }
-            } else {
+            } else if (queryListParams.vaildateShadow()) {
                 if (!queryListParams.vaildateShadowMoods(diaryVO) && !queryListParams.vaildateContent(diaryVO)) {
                     diaryVO.setIpLocation(getIP(diaryVO.getId()));
                     if (!queryListParams.vaildateIp(diaryVO)) {
                         diaryVO = null;
                     }
                 }
+            }else {
+                diaryVO = null;
             }
         }
         return diaryVO;

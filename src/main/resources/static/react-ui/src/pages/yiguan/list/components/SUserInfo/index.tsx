@@ -7,8 +7,8 @@ import AlbumDetail from '../AlbumDetail';
 import { request } from '@umijs/max';
 import { ModalForm, ProFormText, ProForm, ProFormTextArea } from '@ant-design/pro-components';
 
-const url = 'http://localhost:8001';
-// const url = '';
+// const url = 'http://localhost:8001';
+const url = '';
 
 
 const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean }> = ({ sUser, trigger, isInit }) => {
@@ -41,7 +41,6 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
     };
 
     function openChange(open: boolean) {
-        console.log(open);
         if (open) {
 
         }

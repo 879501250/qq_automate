@@ -13,6 +13,8 @@ import java.util.List;
 public class YiguanQueryListParamsVO {
     // 查询结果中真身用户创建的罐头所在只海要在这个列表中
     private List<String> realQueryMoods;
+    // 是否查询分身
+    private Boolean enableShadow;
     // 查询结果中分身用户创建的罐头所在只海要在这个列表中
     private List<String> shadowQueryMoods;
     // 查询结果中分身用户ip是否在这里面
@@ -33,6 +35,10 @@ public class YiguanQueryListParamsVO {
         return realQueryMoods.contains(yiguanDiaryVO.getMood());
     }
 
+    public boolean vaildateShadow() {
+        return Boolean.TRUE.equals(enableShadow);
+    }
+
     /**
      * 判断分身罐头是否在要求的分类中
      *
@@ -40,6 +46,9 @@ public class YiguanQueryListParamsVO {
      * @return
      */
     public Boolean vaildateShadowMoods(YiguanDiaryVO yiguanDiaryVO) {
+        if (!vaildateShadow()) {
+            return false;
+        }
         if (shadowQueryMoods == null) {
             return false;
         }
@@ -53,6 +62,9 @@ public class YiguanQueryListParamsVO {
      * @return
      */
     public Boolean vaildateIp(YiguanDiaryVO yiguanDiaryVO) {
+        if (!vaildateShadow()) {
+            return false;
+        }
         if (ipLocations == null) {
             return false;
         }
@@ -66,6 +78,9 @@ public class YiguanQueryListParamsVO {
      * @return
      */
     public Boolean vaildateContent(YiguanDiaryVO yiguanDiaryVO) {
+        if (!vaildateShadow()) {
+            return false;
+        }
         if (contents == null) {
             return false;
         }

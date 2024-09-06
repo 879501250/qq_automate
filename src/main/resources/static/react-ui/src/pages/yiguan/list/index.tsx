@@ -122,6 +122,7 @@ const Diaries: FC = () => {
     const sUser: SUser = {
       uid: diary.user.id,
       diaryText: diary.text,
+      photos: "",
     };
     if (diary.album) {
       sUser.albumIds = diary.album.id;
