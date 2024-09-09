@@ -63,20 +63,19 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                     values.uid = sUser.uid;
                     values.albumIds = sUserDetail?.albumIds;
                     values.photos = selectedPhotos.join(",");
-                    console.log(values);
                     request(url + '/yiguan/addSUser', {
                         method: 'post',
                         data: values,
                         skipErrorHandler: true,
                     }).then(function (res) {
                         if (res.code == 1) {
-                            console.log(res.data);
                             message.success(`添加成功!`);
                             return true;
+                        } else {
+                            message.error(res.message);
+                            return false;
                         }
-                        return false;
                     });
-                    return false;
                 }}
             >
                 <ProForm.Item label="用户 id">

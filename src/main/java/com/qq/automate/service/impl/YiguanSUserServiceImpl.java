@@ -26,10 +26,14 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
 
     private void initSUserCache() {
         for (YiguanSUser yiguanSUser : yiguanSUserMapper.listAll()) {
-            // 可能出现一个人有多个账号的情况
-            for (String uid : yiguanSUser.getUid().split(",")) {
-                suserCache.put(uid, yiguanSUser);
-            }
+            putSUserCache(yiguanSUser);
+        }
+    }
+
+    private void putSUserCache(YiguanSUser yiguanSUser) {
+        // 可能出现一个人有多个账号的情况
+        for (String uid : yiguanSUser.getUid().split(",")) {
+            suserCache.put(uid, yiguanSUser);
         }
     }
 
@@ -46,7 +50,13 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
         if (sUser == null) {
             sUser = yiguanSUser;
             suserCache.put(yiguanSUser.getUid(), sUser);
-            yiguanSUserMapper.insert(yiguanSUser);
+            try {
+                yiguanSUserMapper.insert(yiguanSUser);
+            } catch (Exception e) {
+                e.printStackTrace();
+                suserCache.remove(yiguanSUser.getUid());
+                return Result.error().message("增加 SUser 失败：" + e.getMessage());
+            }
         } else {
             // 添加专辑 id
             String albumIds = sUser.getAlbumIds();
@@ -80,9 +90,20 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
                     sUser.setDiaryText(diaryText + "&#10;&#10;&#10;" + yiguanSUser.getDiaryText());
                 }
             }
-            yiguanSUserMapper.updateById(sUser);
+            try {
+                yiguanSUserMapper.updateById(sUser);
+            } catch (Exception e) {
+                e.printStackTrace();
+                updateSUserCache(yiguanSUser.getUid());
+                return Result.error().message("修改 SUser 失败：" + e.getMessage());
+            }
         }
         return Result.success().data("suser", sUser);
+    }
+
+    private void updateSUserCache(String uid) {
+        YiguanSUser yiguanSUser = yiguanSUserMapper.selectById(uid);
+        putSUserCache(yiguanSUser);
     }
 
     @Override
