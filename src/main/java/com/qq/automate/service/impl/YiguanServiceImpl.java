@@ -14,7 +14,11 @@ import com.qq.automate.service.YiguanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -46,12 +50,6 @@ public class YiguanServiceImpl implements YiguanService {
                     diaryVO = filterDiary(data);
                     if (diaryVO != null) {
                         YiguanUserVO user = diaryVO.getUser();
-                        if (user.getId() == null) {
-                            user.setAge(data.getStr("age"));
-                        }
-                        if (diaryVO.getAlbum() != null) {
-                            user.setId(data.getByPath("album.uid", String.class));
-                        }
                         if (user.getAvatar() != null) {
                             user.setAvatar(YiguanConstant.YIGUAN_PHOTO_URL + data.getByPath("user.avatar.key", String.class));
                         }
@@ -87,19 +85,21 @@ public class YiguanServiceImpl implements YiguanService {
             String mood = data.getByPath("mood.name", String.class);
             diaryVO.setMood(mood);
             if (isReal || data.getJSONObject("album") != null) {
+                YiguanUserVO user = diaryVO.getUser();
                 if (isReal) {
-                    if (Boolean.TRUE.equals(yiguanSUserService.isSUser(diaryVO.getUser().getId()).getData())) {
-                        diaryVO.setIsSUser(true);
-                    }
+                    user.setAge(data.getStr("age"));
                 } else {
-                    if (Boolean.TRUE.equals(
-                            yiguanSUserService.isSUser(data.getByPath("album.uid", String.class)).getData())) {
-                        diaryVO.setIsSUser(true);
-                    }
+                    user.setId(data.getByPath("album.uid", String.class));
                 }
-                if (!Boolean.TRUE.equals(diaryVO.getIsSUser())
-                        && !queryListParams.vaildateRealMoods(diaryVO)) {
-                    diaryVO = null;
+                if (Boolean.TRUE.equals(yiguanSUserService.isSUser(user.getId()).getData())) {
+                    diaryVO.setIsSUser(true);
+                    yiguanSUserService.updateSUserLastActiveTime(user.getId(),
+                            LocalDateTime.parse(diaryVO.getScore(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                } else {
+                    // 不满足真身的查询条件就不显示
+                    if (!queryListParams.vaildateRealMoods(diaryVO)) {
+                        diaryVO = null;
+                    }
                 }
             } else if (queryListParams.vaildateShadow()) {
                 if (!queryListParams.vaildateShadowMoods(diaryVO) && !queryListParams.vaildateContent(diaryVO)) {
@@ -108,7 +108,7 @@ public class YiguanServiceImpl implements YiguanService {
                         diaryVO = null;
                     }
                 }
-            }else {
+            } else {
                 diaryVO = null;
             }
         }
@@ -123,19 +123,32 @@ public class YiguanServiceImpl implements YiguanService {
         return Result.success().data(queryListParams);
     }
 
-    // 用户凭证
+    // 用户凭证，用的是 jwt
     private static String ygt = null;
 
     @Override
     public Result getYgt(Boolean refresh) {
         if (Boolean.TRUE.equals(refresh) || ygt == null) {
-            refreshYgt();
+            try {
+                refreshYgt();
+            } catch (Exception e) {
+                return Result.error().message(e.getMessage());
+            }
         }
         return Result.success().data(ygt);
     }
 
     private void refreshYgt() {
-        ygt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjg1MzUzMDQsImV4cCI6MTcyNTg3NzEwNH0.9zCm6FJ2_OyDUAacDkPj3J05fgZ5Yl9VgcRp0SxCfo8";
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("phone", "15068696639");
+        map.put("password", "qq20100306");
+        String result = HttpRequest.get(YiguanConstant.YIGUAN_LOGIN_URL).form(map).execute().body();
+        JSONObject jsonObject = JSONUtil.parseObj(result);
+        if (jsonObject.get("code", Integer.class) != 0) {
+            System.out.println(result);
+            throw new RuntimeException(jsonObject.get("msg", String.class));
+        }
+        ygt = jsonObject.getByPath("data.YGT", String.class);
     }
 
     /**

@@ -5,7 +5,7 @@ import PhotoCarousel from '../PhotoCarousel';
 import UserDetail from '../UserDetail';
 import AlbumDetail from '../AlbumDetail';
 import { request } from '@umijs/max';
-import { ModalForm, ProFormText, ProForm, ProFormTextArea } from '@ant-design/pro-components';
+import { ModalForm, ProFormDateTimePicker, ProForm, ProFormTextArea } from '@ant-design/pro-components';
 
 // const url = 'http://localhost:8001';
 const url = '';
@@ -51,7 +51,10 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
             <ModalForm<SUser>
                 title="详情"
                 trigger={trigger}
-                initialValues={{ diaryText: sUserDetail?.diaryText }}
+                initialValues={{
+                    diaryText: sUserDetail?.diaryText,
+                    lastActiveTime: sUserDetail?.lastActiveTime,
+                }}
                 submitter={{
                     searchConfig: {
                         submitText: '添加',
@@ -63,19 +66,24 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                     values.uid = sUser.uid;
                     values.albumIds = sUserDetail?.albumIds;
                     values.photos = selectedPhotos.join(",");
+                    let code;
                     request(url + '/yiguan/addSUser', {
                         method: 'post',
                         data: values,
                         skipErrorHandler: true,
                     }).then(function (res) {
+                        console.log(res);
                         if (res.code == 1) {
                             message.success(`添加成功!`);
-                            return true;
                         } else {
                             message.error(res.message);
-                            return false;
                         }
+                        code = res.code;
                     });
+                    if (code == 1) {
+                        return true;
+                    }
+                    return false;
                 }}
             >
                 <ProForm.Item label="用户 id">
@@ -97,6 +105,7 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                         </Tag>
                     ))}
                 </ProForm.Item>
+                <ProFormDateTimePicker name="lastActiveTime" label="最新活跃时间" />
                 <ProFormTextArea width="xl" label="罐头内容" name="diaryText" />
                 <ProForm.Item label="图片">
                     {sUserDetail?.photos != '' && sUserDetail?.photos?.split(',').map((photo, index) => (

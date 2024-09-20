@@ -78,6 +78,17 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                 if (res.msg == "真身不存在") {
                     message.info("该用户还未开通真身~")
                 }
+            } else if (res.code == 2) {
+                initialState?.refreshYiguanYgt?.().then(function (ygt) {
+                    if (ygt) {
+                        setInitialState((preInitialState) => ({
+                            ...preInitialState, yiguanYgt: ygt
+                        }));
+                        message.info("登录凭证过期，请重新打开查看~")
+                    } else {
+                        message.error("登录凭证过期，获取失败~")
+                    }
+                });
             }
         });
     }
@@ -85,7 +96,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
     function formatTimestamp(timestamp: number) {
         const date = new Date(timestamp);
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的  
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的
         const day = String(date.getDate()).padStart(2, '0');
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -106,17 +117,6 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                     userLastScore.current = res.lastScore;
                     setData(data.concat(res.data));
                 }
-            } else {
-                initialState?.refreshYiguanYgt?.().then(function (ygt) {
-                    if (ygt) {
-                        setInitialState((preInitialState) => ({
-                            ...preInitialState, yiguanYgt: ygt
-                        }));
-                        message.info("登录凭证过期，请重新打开查看~")
-                    } else {
-                        message.error("登录凭证过期，获取失败~")
-                    }
-                });
             }
         });
     };

@@ -42,6 +42,7 @@ type SUser = {
   albumIds?: string;
   diaryText?: string;
   photos?: string;
+  lastActiveTime?: string;
 };
 
 

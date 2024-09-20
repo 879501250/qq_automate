@@ -134,6 +134,7 @@ const Diaries: FC = () => {
     if (sUser.photos?.charAt(0) == ',') {
       sUser.photos = sUser.photos.slice(1);
     }
+    sUser.lastActiveTime = diary.score;
     return sUser;
   }
 

@@ -102,7 +102,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
                     initialValues={initialQueryParams}
                     onValuesChange={
                         (changeValues, values) => {
-                            const copy = { ...queryParams }; 
+                            const copy = { ...queryParams };
                             Object.keys(changeValues).forEach(key => {
                                 if (copy.hasOwnProperty(key)) {
                                     copy[key as keyof QueryParams] = changeValues[key];

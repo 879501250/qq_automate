@@ -8,6 +8,8 @@ import com.qq.automate.service.YiguanSUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +103,11 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
         return Result.success().data("suser", sUser);
     }
 
+    /**
+     * 从数据库中获取指定 suser 最新的信息放进缓存
+     *
+     * @param uid
+     */
     private void updateSUserCache(String uid) {
         YiguanSUser yiguanSUser = yiguanSUserMapper.selectById(uid);
         putSUserCache(yiguanSUser);
@@ -118,6 +125,19 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
             return Result.error().message("未找到用户[" + uid + "]~");
         }
         return Result.success().data(sUser);
+    }
+
+    @Override
+    public Result updateSUserLastActiveTime(String uid, LocalDateTime lastActiveTime) {
+        Result result = getSUserById(uid);
+        if (result.getSuccess()) {
+            YiguanSUser sUser = (YiguanSUser) result.getData();
+            yiguanSUserMapper.updateLastActiveTime(sUser.getUid(), lastActiveTime);
+            sUser.setLastActiveTime(lastActiveTime);
+            putSUserCache(sUser);
+            result.message("更新成功~");
+        }
+        return result;
     }
 
 }

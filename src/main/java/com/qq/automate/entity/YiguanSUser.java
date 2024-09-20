@@ -3,9 +3,13 @@ package com.qq.automate.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * 一罐——— ss用户
@@ -44,4 +48,10 @@ public class YiguanSUser {
      */
     @TableField("diaryText")
     private String diaryText;
+    /**
+     * 用户最近活跃时间（以最新罐头发布时间为准）
+     */
+    @TableField("lastActiveTime")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastActiveTime;
 }
