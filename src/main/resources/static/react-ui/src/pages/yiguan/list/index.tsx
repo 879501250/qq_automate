@@ -1,37 +1,27 @@
-import { UserOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import {
-  Avatar,
   Card,
   Form,
-  List,
-  Select,
-  Tag,
   message,
-  Button,
-  Tooltip,
   InputNumber,
   Upload,
+  Button,
+  Modal,
 } from 'antd';
-import { DefaultOptionType } from 'antd/es/select';
+import { SyncOutlined } from '@ant-design/icons';
 import type { FC } from 'react';
-import type { UploadProps, UploadFile } from 'antd';
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import QueryForm from './components/QueryForm';
-import PhotoCarousel from './components/PhotoCarousel';
-import SUserInfo from './components/SUserInfo';
-import AlbumDetail from './components/AlbumDetail';
-import UserDetail from './components/UserDetail';
-import type { SUser, Diary, Mood } from './data.d';
-import { queryFakeList } from './service';
+import DiaryList from './components/DiaryList';
+import StandardFormRow from './components/StandardFormRow';
+import ExportForm from './components/ExportForm';
+import type { Diary } from './data.d';
 import useStyles from './style.style';
 import { request } from '@umijs/max';
-import VirtualList from 'rc-virtual-list';
 
 const FormItem = Form.Item;
 
 const pageSize = 5;
-const ContainerHeight = 700;
 
 // const url = 'http://localhost:8001';
 const url = '';
@@ -55,6 +45,8 @@ const Diaries: FC = () => {
 
 
   const [list, setList] = useState<Diary[]>([]);
+  const [sUseList, setSUseList] = useState<Diary[]>([]);
+  const [albumList, setAlbumList] = useState<Diary[]>([]);
   const lastScore = useRef(0);
   const appendData = () => {
     request(url + '/yiguan/listNew', {
@@ -66,6 +58,13 @@ const Diaries: FC = () => {
         if (data.diaries.length > 0) {
           lastScore.current = data.lastScore;
           setList(list.concat(data.diaries));
+          data.diaries.forEach((diary: Diary) => {
+            if (diary.isSUser) {
+              setSUseList(sUseList.concat(diary));
+            } else if (diary.album) {
+              setAlbumList(albumList.concat(diary));
+            }
+          })
           messageApi.success(`新增罐头${data.diaries.length}个，当前共${data.diaries.length + list.length}个!`);
         }
       }
@@ -76,6 +75,20 @@ const Diaries: FC = () => {
     appendData();
   }, []);
 
+  function loadDiary(file: any) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsedData = JSON.parse(e.target?.result?.toString() || "");
+        setList(parsedData.concat(list));
+        message.success(`成功导入 ${parsedData.length} 条数据~`);
+      } catch (error) {
+        message.error('导入文件错误:' + error);
+      }
+    };
+    reader.readAsText(file);
+  }
+
   const saveCallBack: any = useRef();
   useEffect(() => {
     saveCallBack.current = appendData;
@@ -85,58 +98,16 @@ const Diaries: FC = () => {
   const tick = () => {
     saveCallBack.current();
   };
-  const [time, setTime] = useState<number | null>(3);
+  const [time, setTime] = useState<number | null>(1);
   useEffect(() => {
-    timer = setInterval(tick, time ? time * 1000 : 3000);
+    timer = setInterval(tick, time ? time * 1000 : 1000);
     return () => {
       clearInterval(timer);
     };
   }, [time]);
 
-  // 移除罐头列表前 count 项
-  const removeDiaryList = (count: number) => {
-    setList(list.slice(count));
-  }
-
-  const getActions = (diary: Diary, index: number): React.ReactNode[] => {
-    const actions: React.ReactNode[] = [];
-    actions.push(<Tag>{diary.id}</Tag>);
-    actions.push(<Tag>{diary.score}</Tag>);
-    if (diary.album) {
-      actions.push(<AlbumDetail album={diary.album} title={diary.album.title || '罐头专辑'} />);
-    }
-    if (diary.user.id) {
-      actions.push(
-        <SUserInfo
-          sUser={convertToSUser(diary)}
-          trigger={<Button >详情</Button>}
-          isInit={true}
-        />
-      );
-    }
-    actions.push(<Button danger onClick={() => removeDiaryList(index + 1)}>删除</Button>);
-    return actions;
-  };
-
-  const convertToSUser = (diary: Diary): SUser => {
-    const sUser: SUser = {
-      uid: diary.user.id,
-      diaryText: diary.text,
-      photos: "",
-    };
-    if (diary.album) {
-      sUser.albumIds = diary.album.id;
-      if (diary.album.photo) {
-        sUser.photos = diary.album.photo;
-      }
-    }
-    diary.photos.map((photo: string) => sUser.photos += ',' + photo);
-    if (sUser.photos?.charAt(0) == ',') {
-      sUser.photos = sUser.photos.slice(1);
-    }
-    sUser.lastActiveTime = diary.score;
-    return sUser;
-  }
+  const [sUserModal, setSUserModal] = useState(false);
+  const [albumModal, setAlbumModal] = useState(false);
 
   if (loading) {
     return <div />;
@@ -148,68 +119,92 @@ const Diaries: FC = () => {
       <QueryForm
         diaryList={list}
         setList={setList}
-        removeDiaryList={removeDiaryList}
-        time={time}
-        setTime={setTime}
+        removeDiaryList={(count) => { setList(list.slice(count)); }}
+        other={
+          <StandardFormRow title="其它选项" grid last>
+            <span>当前总数：{list.length}</span>
+            <SyncOutlined spin style={{ color: '#1677ff' }} />
+            <InputNumber
+              min={0.1}
+              max={60}
+              value={time}
+              onChange={setTime}
+              // defaultValue={5.0}
+              step={0.5}
+              changeOnWheel
+              suffix="秒"
+            />
+            <Button style={{ "margin": '0 10px 0 10px' }} onClick={() => { setSUserModal(true) }}>
+              S
+            </Button>
+            <Modal
+              title={sUseList.length}
+              width={'80%'}
+              open={sUserModal}
+              onCancel={() => { setSUserModal(false) }}
+              footer={[
+                <Button onClick={() => { setSUseList([]); }}>
+                  清空
+                </Button>,
+              ]}
+            >
+              <DiaryList
+                diaryList={sUseList}
+                removeDiaryList={(count) => { setSUseList(sUseList.slice(count)); }}
+              />
+            </Modal>
+            <Button style={{ "margin": '0 10px 0 10px' }} onClick={() => { setAlbumModal(true) }}>
+              专辑
+            </Button>
+            <Modal
+              title={albumList.length}
+              width={'80%'}
+              open={albumModal}
+              onCancel={() => { setAlbumModal(false) }}
+              footer={[
+                <Button onClick={() => { setAlbumList([]); }}>
+                  清空
+                </Button>,
+              ]}
+            >
+              <DiaryList
+                diaryList={albumList}
+                removeDiaryList={(count) => { setAlbumList(albumList.slice(count)); }}
+              />
+            </Modal>
+            <Button
+              style={{ "margin": '0 10px 0 10px' }}
+              onClick={() => {
+                setSUseList([]);
+                setAlbumList([]);
+                setList([]);
+              }}
+            >
+              全部清空
+            </Button>
+            <Upload
+              beforeUpload={(file) => {
+                loadDiary(file);
+                return false;
+              }}
+              maxCount={1}
+              showUploadList={false}
+            >
+              <Button style={{ "margin": '0 10px 0 10px' }}>导入</Button>
+            </Upload>
+            <ExportForm diaryList={list} removeDiaryList={(count) => { setList(list.slice(count)); }} />
+          </StandardFormRow>
+        }
       />
       <Card
         style={{ marginTop: 24 }}
         bordered={false}
       // bodyStyle={{ padding: '8px 32px 32px 32px' }}
       >
-        <List itemLayout="vertical">
-          <VirtualList
-            data={list}
-            height={ContainerHeight}
-            itemHeight={50}
-            itemKey="id"
-          // onScroll={onScroll}
-          >
-            {(diary: Diary, index) => (
-              <List.Item
-                key={diary.id}
-                actions={getActions(diary, index)}
-                extra={
-                  <div style={{ width: '250px', height: '250px', margin: '0 20px 0 0' }}>
-                    <PhotoCarousel photos={diary.photos} />
-                  </div>
-                }
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      src={diary.user.avatar || ''}
-                      icon={!diary.user.avatar && <UserOutlined />}
-                      size={64} />
-                  }
-                  title={
-                    <div>
-                      <UserDetail userId={diary.user.id} title={diary.user.nickname} />
-                    </div>
-                  }
-                  description={
-                    <span>
-                      <Tag>#{index}</Tag>
-                      {
-                        diary.isSUser
-                        &&
-                        <SUserInfo
-                          sUser={{ uid: diary.user.id }}
-                          trigger={<Tag color="#f50">S</Tag>}
-                          isInit={false}
-                        />
-                      }
-                      <Tag>{diary.mood}</Tag>
-                      {diary.user.age && <Tag>{diary.user.age}</Tag>}
-                      {diary.ipLocation && <Tag>{diary.ipLocation}</Tag>}
-                    </span>
-                  }
-                />
-                {diary.text}
-              </List.Item>
-            )}
-          </VirtualList>
-        </List>
+        <DiaryList
+          diaryList={list}
+          removeDiaryList={(count) => { setList(list.slice(count)); }}
+        />
       </Card>
     </>
   );

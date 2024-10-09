@@ -1,20 +1,14 @@
-import { SyncOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import { useModel } from 'umi';
 import {
     Card,
     Form,
     Select,
-    message,
-    Button,
-    InputNumber,
-    Upload,
     Switch,
 } from 'antd';
 import { Mood, Diary } from '../../data';
 import StandardFormRow from '../StandardFormRow';
 import TagSelect from '../TagSelect';
-import ExportForm from '../ExportForm';
 import { request } from '@umijs/max';
 
 type QueryParams = {
@@ -29,8 +23,7 @@ interface QueryFormProps {
     diaryList: Diary[];
     setList: (list: Diary[]) => void;
     removeDiaryList: (count: number) => void;
-    time: number | null;
-    setTime: (time: number | null) => void;
+    other: JSX.Element
 }
 
 const FormItem = Form.Item;
@@ -38,7 +31,7 @@ const FormItem = Form.Item;
 // const url = 'http://localhost:8001';
 const url = '';
 
-const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryList, time, setTime }) => {
+const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryList, other }) => {
 
     const { initialState } = useModel('@@initialState');
 
@@ -46,7 +39,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
 
 
     const [selectedIpLocations, setSelectedIpLocations] = useState<string[]>(["全部"]);
-    const [enableShadow, setEnableShadow] = useState<boolean>(true);
+    const [enableShadow, setEnableShadow] = useState<boolean>(false);
 
     const ipLocations: string[] = ["全部", "海外"].concat(initialState?.chinaProvinces || []);
     const filteredIps = ipLocations.filter((o) => {
@@ -78,20 +71,6 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
             // }
         });
     }, [queryParams]);
-
-    function loadDiary(file: any) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const parsedData = JSON.parse(e.target?.result?.toString() || "");
-                setList(parsedData.concat(diaryList));
-                message.success(`成功导入 ${parsedData.length} 条数据~`);
-            } catch (error) {
-                message.error('导入文件错误:' + error);
-            }
-        };
-        reader.readAsText(file);
-    }
 
     return (
         <>
@@ -167,30 +146,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
                             </StandardFormRow>
                         </div>
                     }
-                    <StandardFormRow title="其它选项" grid last>
-                        <span>当前总数：{diaryList.length}</span>
-                        <SyncOutlined spin style={{ color: '#1677ff' }} />
-                        <InputNumber
-                            min={0.1}
-                            max={60}
-                            value={time}
-                            onChange={setTime}
-                            // defaultValue={5.0}
-                            step={0.5}
-                            changeOnWheel
-                            suffix="秒"
-                        />
-                        <Upload
-                            beforeUpload={(file) => {
-                                loadDiary(file);
-                                return false;
-                            }}
-                            maxCount={1}
-                        >
-                            <Button>导入</Button>
-                        </Upload>
-                        <ExportForm diaryList={diaryList} removeDiaryList={removeDiaryList} />
-                    </StandardFormRow>
+                    {other}
                 </Form>
             </Card >
         </>
