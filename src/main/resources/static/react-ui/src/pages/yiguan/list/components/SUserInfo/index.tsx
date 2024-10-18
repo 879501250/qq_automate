@@ -5,10 +5,16 @@ import PhotoCarousel from '../PhotoCarousel';
 import UserDetail from '../UserDetail';
 import AlbumDetail from '../AlbumDetail';
 import { request } from '@umijs/max';
-import { ModalForm, ProFormDateTimePicker, ProForm, ProFormTextArea } from '@ant-design/pro-components';
+import {
+    ModalForm,
+    ProFormDateTimePicker,
+    ProForm,
+    ProFormTextArea,
+    CheckCard,
+} from '@ant-design/pro-components';
 
-// const url = 'http://localhost:8001';
-const url = '';
+// const baseUrl = 'http://localhost:8001';
+const baseUrl = '';
 
 
 const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean }> = ({ sUser, trigger, isInit }) => {
@@ -17,11 +23,12 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
 
     useEffect(() => {
         if (!isInit) {
-            request(url + '/yiguan/getSUserById', {
+            request(baseUrl + '/yiguan/getSUserById', {
                 params: { 'uid': sUser.uid, },
                 skipErrorHandler: true,
             }).then(function (res) {
                 if (res.code == 1) {
+                    setSelectedPhotos(res.data.photos?.split(','));
                     setSUserDetail(res.data);
                 } else {
                     message.error(res.message);
@@ -57,22 +64,27 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                 }}
                 submitter={{
                     searchConfig: {
-                        submitText: '添加',
+                        submitText: isInit ? '添加' : '更新',
                         resetText: '取消',
                     },
                 }}
                 onOpenChange={openChange}
                 onFinish={async (values) => {
                     values.uid = sUser.uid;
+                    values.photos = selectedPhotos?.join(",");
                     values.albumIds = sUserDetail?.albumIds;
-                    values.photos = selectedPhotos.join(",");
-                    let code;
-                    request(url + '/yiguan/addSUser', {
+                    let code = 0;
+                    let url;
+                    if (isInit) {
+                        url = baseUrl + '/yiguan/addSUser';
+                    } else {
+                        url = baseUrl + '/yiguan/updateSUser';
+                    }
+                    request(url, {
                         method: 'post',
                         data: values,
                         skipErrorHandler: true,
                     }).then(function (res) {
-                        console.log(res);
                         if (res.code == 1) {
                             message.success(`添加成功!`);
                         } else {
@@ -87,26 +99,19 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                 }}
             >
                 <ProForm.Item label="用户 id">
-                    {sUserDetail?.uid.split(',').map((uid, index) => (
+                    {sUserDetail?.uid?.split(',').map((uid, index) => (
                         <Tag bordered={false} color="green" key={index}>
                             <UserDetail userId={uid} title={uid} />
                         </Tag>
                     ))}
                 </ProForm.Item>
-                <ProForm.Item label="专辑 id">
+                <ProForm.Item label="专辑" name="albumIdList">
                     {sUserDetail?.albumIds?.split(',').map((albumId, index) => (
-                        <Tag bordered={false} color="green" key={index}>
-                            <AlbumDetail
-                                album={{
-                                    id: albumId,
-                                }}
-                                title={albumId}
-                            />
-                        </Tag>
+                        <AlbumDetail album={{ id: albumId, }} title={albumId} uid={sUserDetail?.uid} />
                     ))}
                 </ProForm.Item>
                 <ProFormDateTimePicker name="lastActiveTime" label="最新活跃时间" />
-                <ProFormTextArea width="xl" label="罐头内容" name="diaryText" />
+                <ProFormTextArea fieldProps={{ rows: 5 }} label="罐头内容" name="diaryText" />
                 <ProForm.Item label="图片">
                     {sUserDetail?.photos != '' && sUserDetail?.photos?.split(',').map((photo, index) => (
                         <Tooltip

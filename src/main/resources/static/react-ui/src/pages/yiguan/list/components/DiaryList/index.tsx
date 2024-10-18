@@ -5,16 +5,18 @@ import {
     Avatar,
     Tag,
     List,
+    Input,
 } from 'antd';
 import VirtualList from 'rc-virtual-list';
 import { Diary, SUser } from '../../data';
-import UserDetail from '../UserDetail';
-import PhotoCarousel from '../PhotoCarousel';
 import SUserInfo from '../SUserInfo';
 import AlbumDetail from '../AlbumDetail';
+import DiaryDetail from '../DiaryDetail';
 
-const url = 'http://localhost:8001';
-// const url = '';
+// const url = 'http://localhost:8001';
+const url = '';
+
+const { TextArea } = Input;
 
 
 const ContainerHeight = 700;
@@ -28,10 +30,12 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
 
     const getActions = (diary: Diary, index: number): React.ReactNode[] => {
         const actions: React.ReactNode[] = [];
-        actions.push(<Tag>{diary.id}</Tag>);
-        actions.push(<Tag>{diary.score}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.id}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.score}</Tag>);
         if (diary.album) {
-            actions.push(<AlbumDetail album={diary.album} title={diary.album.title || '罐头专辑'} />);
+            actions.push(
+                <AlbumDetail album={diary.album} title={diary.album.title || '罐头专辑'} uid={diary.user.id} />
+            );
         }
         if (diary.user.id) {
             actions.push(
@@ -79,47 +83,14 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
             // onScroll={onScroll}
             >
                 {(diary: Diary, index) => (
-                    <List.Item
-                        key={diary.id}
-                        actions={getActions(diary, index)}
-                        extra={
-                            <div style={{ width: '250px', height: '250px', margin: '0 20px 0 0' }}>
-                                <PhotoCarousel photos={diary.photos} />
-                            </div>
-                        }
-                    >
-                        <List.Item.Meta
-                            avatar={
-                                <Avatar
-                                    src={diary.user.avatar || ''}
-                                    icon={!diary.user.avatar && <UserOutlined />}
-                                    size={64} />
-                            }
-                            title={
-                                <div>
-                                    <UserDetail userId={diary.user.id} title={diary.user.nickname} />
-                                </div>
-                            }
-                            description={
-                                <span>
-                                    <Tag>#{index}</Tag>
-                                    {
-                                        diary.isSUser
-                                        &&
-                                        <SUserInfo
-                                            sUser={{ uid: diary.user.id }}
-                                            trigger={<Tag color="#f50">S</Tag>}
-                                            isInit={false}
-                                        />
-                                    }
-                                    <Tag>{diary.mood}</Tag>
-                                    {diary.user.age && <Tag>{diary.user.age}</Tag>}
-                                    {diary.ipLocation && <Tag>{diary.ipLocation}</Tag>}
-                                </span>
-                            }
+                    <div>
+                        <DiaryDetail
+                            diary={diary}
+                            index={index}
+                            actions={getActions(diary, index)}
+                            enableMeta={true}
                         />
-                        {diary.text}
-                    </List.Item>
+                    </div>
                 )}
             </VirtualList>
         </List>

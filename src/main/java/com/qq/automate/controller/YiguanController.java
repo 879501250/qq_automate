@@ -38,7 +38,7 @@ public class YiguanController {
     }
 
     @PostMapping("/setQueryListParams")
-    public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO){
+    public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO) {
         return yiguanService.setQueryListParams(yiguanQueryListParamsVO);
     }
 
@@ -51,13 +51,19 @@ public class YiguanController {
     public Result addSUser(@RequestBody YiguanSUser yiguanSUser) {
         return yiguanSUserService.addSUser(yiguanSUser);
     }
+
+    @PostMapping("/updateSUser")
+    public Result updateSUser(@RequestBody YiguanSUser yiguanSUser) {
+        return yiguanSUserService.updateSUser(yiguanSUser);
+    }
+
     @GetMapping("/getSUserById")
     public Result getSUserById(String uid) {
         return yiguanSUserService.getSUserById(uid);
     }
 
     @GetMapping("/getYgt")
-    public Result getYgt(Boolean refresh){
+    public Result getYgt(Boolean refresh) {
         return yiguanService.getYgt(refresh);
     }
 }

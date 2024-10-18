@@ -43,7 +43,7 @@ public class YiguanServiceImpl implements YiguanService {
             JSONObject data = datas.get(i, JSONObject.class);
             // 判断时间
             Long score = data.getLong("createTime");
-            if (lastScore == null || lastScore < score) {
+            if (lastScore < score) {
                 // 判断性别
                 Integer gender = data.getByPath("user.gender", Integer.class);
                 if (2 == gender) {
@@ -95,6 +95,10 @@ public class YiguanServiceImpl implements YiguanService {
                     diaryVO.setIsSUser(true);
                     yiguanSUserService.updateSUserLastActiveTime(user.getId(),
                             LocalDateTime.parse(diaryVO.getScore(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                    // 收集 suser 的专辑
+                    if (diaryVO.getAlbum() != null) {
+                        yiguanSUserService.updateSUserAlbumIds(user.getId(), diaryVO.getAlbum().getId());
+                    }
                 } else {
                     // 不满足真身的查询条件就不显示
                     if (!queryListParams.vaildateRealMoods(diaryVO)) {

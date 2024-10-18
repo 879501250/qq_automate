@@ -57,14 +57,22 @@ const Diaries: FC = () => {
         const data = res.data;
         if (data.diaries.length > 0) {
           lastScore.current = data.lastScore;
-          setList(list.concat(data.diaries));
+          let sUsers: Diary[] = [];
+          let albums: Diary[] = [];
           data.diaries.forEach((diary: Diary) => {
             if (diary.isSUser) {
-              setSUseList(sUseList.concat(diary));
+              sUsers.push(diary);
             } else if (diary.album) {
-              setAlbumList(albumList.concat(diary));
+              albums.push(diary);
             }
           })
+          if (sUsers.length > 0) {
+            setSUseList(sUseList.concat(sUsers));
+          }
+          if (albums.length > 0) {
+            setAlbumList(albumList.concat(albums));
+          }
+          setList(list.concat(data.diaries));
           messageApi.success(`新增罐头${data.diaries.length}个，当前共${data.diaries.length + list.length}个!`);
         }
       }
@@ -122,7 +130,7 @@ const Diaries: FC = () => {
         removeDiaryList={(count) => { setList(list.slice(count)); }}
         other={
           <StandardFormRow title="其它选项" grid last>
-            <span>当前总数：{list.length}</span>
+            <span>当前总数：{list.length}，S：{sUseList.length}，专辑：{albumList.length}。</span>
             <SyncOutlined spin style={{ color: '#1677ff' }} />
             <InputNumber
               min={0.1}
@@ -203,7 +211,24 @@ const Diaries: FC = () => {
       >
         <DiaryList
           diaryList={list}
-          removeDiaryList={(count) => { setList(list.slice(count)); }}
+          removeDiaryList={(count) => {
+            let i = 0, j = 0;
+            for (let n = 0; n < count; n++) {
+              if (sUseList.length > i && list[n].id == sUseList[i].id) {
+                i++;
+              }
+              if (albumList.length > j && list[n].id == albumList[j].id) {
+                j++;
+              }
+            }
+            if (i > 0) {
+              setSUseList(sUseList.slice(i));
+            }
+            if (j > 0) {
+              setAlbumList(albumList.slice(j));
+            }
+            setList(list.slice(count));
+          }}
         />
       </Card>
     </>

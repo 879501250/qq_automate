@@ -3,12 +3,14 @@ export interface Diary {
   text: string;
   photos: any[] | string[];
   createTime: number;
-  mood: string;
+  mood: string | any;
   score: string;
   ipLocation: string;
   user: User;
   album: Album;
   isSUser: boolean;
+  likedNum?: number;
+  commentedNum?: number;
 }
 
 export type User = {

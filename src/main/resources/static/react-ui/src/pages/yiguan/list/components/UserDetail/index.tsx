@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useModel } from 'umi';
-import { Tooltip, Avatar, Modal, Card, message, List, Tag, Col, Row } from 'antd';
-import { User, Diary } from '../../data';
+import { Tooltip, Avatar, Modal, Card, message, List, Tag, Col, Row, Button, Space } from 'antd';
+import { LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { SUser, Diary } from '../../data';
 import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
 import VirtualList from 'rc-virtual-list';
 import AlbumDetail from '../AlbumDetail';
+import DiaryDetail from '../DiaryDetail';
+import SUserInfo from '../SUserInfo';
 
 type UserInfo = {
     id: string;
@@ -45,6 +48,13 @@ const photoUrl = 'http://photo.pcdn.jijigugu.club/';
 const ContainerHeight = 400;
 
 const { Meta } = Card;
+
+const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
+    <Space>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
 
 const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title }) => {
 
@@ -130,14 +140,60 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
 
     const getActions = (diary: Diary, index: number): React.ReactNode[] => {
         const actions: React.ReactNode[] = [];
-        actions.push(<Tag>{formatTimestamp(diary.createTime * 1000)}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.id}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{formatTimestamp(diary.createTime * 1000)}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.mood.name}</Tag>);
+        actions.push(
+            <IconText
+                icon={LikeOutlined}
+                text={diary.likedNum ? '' + diary.likedNum : '0'}
+                key="list-vertical-like-o"
+            />
+        );
+        actions.push(
+            <a onClick={() => { console.log(1) }}>
+                <IconText
+                    icon={MessageOutlined}
+                    text={diary.commentedNum ? '' + diary.commentedNum : '0'}
+                    key="list-vertical-message"
+                />
+            </a>
+        );
         if (diary.album) {
-            actions.push(<AlbumDetail album={diary.album} title={diary.album.title || "罐头专辑"} />);
+            actions.push(
+                <AlbumDetail album={diary.album} title={diary.album.title || "罐头专辑"} uid={diary.user.id} />
+            );
+        }
+        if (diary.user.id) {
+            actions.push(
+                <SUserInfo
+                    sUser={convertToSUser(diary)}
+                    trigger={<Button>详情</Button>}
+                    isInit={true}
+                />
+            );
         }
         return actions;
     };
 
-
+    const convertToSUser = (diary: Diary): SUser => {
+        const sUser: SUser = {
+            uid: diary.user.id,
+            diaryText: diary.text,
+            photos: "",
+        };
+        if (diary.album) {
+            sUser.albumIds = diary.album.id;
+            if (diary.album.photo) {
+                sUser.photos = diary.album.photo;
+            }
+        }
+        diary.photos.map((photo: any) => sUser.photos += ',' + photo.url);
+        if (sUser.photos?.charAt(0) == ',') {
+            sUser.photos = sUser.photos.slice(1);
+        }
+        return sUser;
+    }
 
     if (!userId) {
         return <>{title}</>
@@ -205,17 +261,15 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                             onScroll={onScroll}
                         >
                             {(diary: Diary, index) => (
-                                <List.Item
-                                    key={diary.id}
-                                    actions={getActions(diary, index)}
-                                    extra={
-                                        <div style={{ width: '250px', height: '250px', margin: '0 20px 0 0' }}>
-                                            <PhotoCarousel photos={diary.photos.map((photo) => photo.url)} />
-                                        </div>
-                                    }
-                                >
-                                    <div>{diary.text}</div>
-                                </List.Item>
+                                <div>
+                                    <DiaryDetail
+                                        diary={diary}
+                                        index={index}
+                                        actions={getActions(diary, index)}
+                                        enableMeta={false}
+                                        photos={diary.photos.map((photo) => photo.url)}
+                                    />
+                                </div>
                             )}
                         </VirtualList>
                     </List>

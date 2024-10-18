@@ -60,15 +60,6 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
                 return Result.error().message("增加 SUser 失败：" + e.getMessage());
             }
         } else {
-            // 添加专辑 id
-            String albumIds = sUser.getAlbumIds();
-            if (albumIds == null || albumIds.isEmpty()) {
-                sUser.setAlbumIds(yiguanSUser.getAlbumIds());
-            } else {
-                if (yiguanSUser.getAlbumIds() != null && !albumIds.contains(yiguanSUser.getAlbumIds())) {
-                    sUser.setAlbumIds(albumIds + "," + yiguanSUser.getAlbumIds());
-                }
-            }
             // 添加图片
             String photos = sUser.getPhotos();
             if (photos == null || photos.isEmpty()) {
@@ -92,15 +83,24 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
                     sUser.setDiaryText(diaryText + "&#10;&#10;&#10;" + yiguanSUser.getDiaryText());
                 }
             }
-            try {
-                yiguanSUserMapper.updateById(sUser);
-            } catch (Exception e) {
-                e.printStackTrace();
-                updateSUserCache(yiguanSUser.getUid());
-                return Result.error().message("修改 SUser 失败：" + e.getMessage());
+            Result result = updateSUser(sUser);
+            if (!result.getSuccess()) {
+                return result;
             }
         }
         return Result.success().data("suser", sUser);
+    }
+
+    @Override
+    public Result updateSUser(YiguanSUser yiguanSUser) {
+        try {
+            yiguanSUserMapper.updateById(yiguanSUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error().message("修改 SUser 失败：" + e.getMessage());
+        }
+        putSUserCache(yiguanSUser);
+        return Result.success().data("suser", yiguanSUser);
     }
 
     /**
@@ -134,8 +134,37 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
             YiguanSUser sUser = (YiguanSUser) result.getData();
             yiguanSUserMapper.updateLastActiveTime(sUser.getUid(), lastActiveTime);
             sUser.setLastActiveTime(lastActiveTime);
-            putSUserCache(sUser);
             result.message("更新成功~");
+        }
+        return result;
+    }
+
+    @Override
+    public Result updateSUserAlbumIds(String uid, String albumId) {
+        if (albumId == null || "".equals(albumId)) {
+            return Result.error().message("非法的参数：albumId [" + albumId + "]");
+        }
+        Result result = getSUserById(uid);
+        if (result.getSuccess()) {
+            YiguanSUser sUser = (YiguanSUser) result.getData();
+            String albumIds = sUser.getAlbumIds();
+            boolean b = false;
+            if (albumIds == null || "".equals(albumIds)) {
+                albumIds = albumId;
+                b = true;
+            } else {
+                if (!albumIds.contains(albumId)) {
+                    albumIds += "," + albumId;
+                    b = true;
+                }
+            }
+            if (b) {
+                yiguanSUserMapper.updateAlbumIds(sUser.getUid(), albumIds);
+                sUser.setAlbumIds(albumIds);
+                result.message("更新成功~");
+            } else {
+                result.message("专辑已添加~");
+            }
         }
         return result;
     }

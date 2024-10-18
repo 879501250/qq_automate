@@ -20,4 +20,7 @@ public interface YiguanSUserMapper extends BaseMapper<YiguanSUser> {
     @Update("update yiguan_suser set lastActiveTime = #{lastActiveTime} where uid = #{uid}")
     int updateLastActiveTime(@Param("uid") String uid,
                              @Param("lastActiveTime") LocalDateTime lastActiveTime);
+
+    @Update("update yiguan_suser set albumIds = #{albumIds} where uid = #{uid}")
+    int updateAlbumIds(@Param("uid") String uid, @Param("albumIds") String albumIds);
 }

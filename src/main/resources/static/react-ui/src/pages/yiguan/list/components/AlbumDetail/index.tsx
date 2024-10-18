@@ -1,24 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Modal, Card, Tooltip, List, Tag, Col, Row, message } from 'antd';
-import { Album, Diary } from '../../data';
+import { Button, Modal, Card, Tooltip, List, Tag, Col, Row, message, Space } from 'antd';
+import { LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { Album, Diary, SUser } from '../../data';
 import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
 import VirtualList from 'rc-virtual-list';
+import DiaryDetail from '../DiaryDetail';
+import SUserInfo from '../SUserInfo';
 
 
 const detailUrl = 'https://api.jijigugu.club/album/detail';
 const listUrl = 'https://api.jijigugu.club/feed/listByAlbum';
 const ContainerHeight = 400;
 
-const AlbumDetail: React.FC<{ album: Album, title: string }> = ({ album, title }) => {
+const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
+    <Space>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ album, title, uid }) => {
 
 
     const [open, setOpen] = useState(false);
     const showModal = () => {
         albumLastScore.current = null;
-        if (albumDetail.photo) {
-            setLoad(false);
-        }
         appendData();
         setOpen(true);
     };
@@ -67,20 +74,72 @@ const AlbumDetail: React.FC<{ album: Album, title: string }> = ({ album, title }
     const [albumDetail, setAlbumDetail] = useState<Album>(album);
     const [load, setLoad] = useState<boolean>(true);
     function openChange(open: boolean) {
-        if (open && album.photo == undefined) {
-            request(detailUrl, {
-                params: { 'id': album.id },
-                skipErrorHandler: true,
-            }).then(function (res) {
-                if (res.code == 0) {
-                    setAlbumDetail(res.data);
-                    setLoad(false);
-                    album.photo = res.data.photo;
-                } else {
-                    message.error(res.msg);
-                }
-            });
+        if (open) {
+            if (album.photo == undefined || album.diaryNum == undefined) {
+                request(detailUrl, {
+                    params: { 'id': album.id },
+                    skipErrorHandler: true,
+                }).then(function (res) {
+                    if (res.code == 0) {
+                        setAlbumDetail(res.data);
+                        album.photo = res.data.photo;
+                        setLoad(false);
+                    } else {
+                        message.error(res.msg);
+                    }
+                });
+            } else {
+                setLoad(false);
+            }
         }
+    }
+
+    const getActions = (diary: Diary, index: number): React.ReactNode[] => {
+        const actions: React.ReactNode[] = [];
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.id}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.score}</Tag>);
+        actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.mood.name}</Tag>);
+        actions.push(
+            <IconText
+                icon={LikeOutlined}
+                text={diary.likedNum ? '' + diary.likedNum : '0'}
+                key="list-vertical-like-o"
+            />
+        );
+        actions.push(
+            <IconText
+                icon={MessageOutlined}
+                text={diary.commentedNum ? '' + diary.commentedNum : '0'}
+                key="list-vertical-message"
+            />
+        );
+        actions.push(
+            <SUserInfo
+                sUser={convertToSUser(diary)}
+                trigger={<Button>详情</Button>}
+                isInit={true}
+            />
+        );
+        return actions;
+    };
+
+    const convertToSUser = (diary: Diary): SUser => {
+        const sUser: SUser = {
+            uid: diary.user.id || uid,
+            diaryText: diary.text,
+            photos: "",
+        };
+        if (diary.album) {
+            sUser.albumIds = diary.album.id;
+            if (diary.album.photo) {
+                sUser.photos = diary.album.photo;
+            }
+        }
+        diary.photos.map((photo: any) => sUser.photos += ',' + photo.url);
+        if (sUser.photos?.charAt(0) == ',') {
+            sUser.photos = sUser.photos.slice(1);
+        }
+        return sUser;
     }
 
 
@@ -95,9 +154,12 @@ const AlbumDetail: React.FC<{ album: Album, title: string }> = ({ album, title }
                 onOpenChange={openChange}
                 fresh={true}
             >
-                <Button type="primary" onClick={showModal}>
+                {/* <Button type="primary" onClick={showModal}>
                     {title}
-                </Button>
+                </Button> */}
+                <Tag color="#108ee9" onClick={showModal}>
+                    {title}
+                </Tag>
             </Tooltip>
             <Modal
                 width={'80%'}
@@ -146,18 +208,16 @@ const AlbumDetail: React.FC<{ album: Album, title: string }> = ({ album, title }
                             itemKey="id"
                             onScroll={onScroll}
                         >
-                            {(diary: Diary) => (
-                                <List.Item
-                                    key={diary.id}
-                                    actions={[<Tag>{diary.score}</Tag>]}
-                                    extra={
-                                        <div style={{ width: '250px', height: '250px', margin: '0 20px 0 0' }}>
-                                            <PhotoCarousel photos={diary.photos.map((photo) => photo.url)} />
-                                        </div>
-                                    }
-                                >
-                                    <div>{diary.text}</div>
-                                </List.Item>
+                            {(diary: Diary, index) => (
+                                <div>
+                                    <DiaryDetail
+                                        diary={diary}
+                                        index={index}
+                                        actions={getActions(diary, index)}
+                                        enableMeta={false}
+                                        photos={diary.photos.map((photo) => photo.url)}
+                                    />
+                                </div>
                             )}
                         </VirtualList>
                     </List>
