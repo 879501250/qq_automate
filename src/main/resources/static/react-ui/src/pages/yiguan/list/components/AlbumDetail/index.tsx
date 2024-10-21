@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Modal, Card, Tooltip, List, Tag, Col, Row, message, Space } from 'antd';
-import { LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { Album, Diary, SUser } from '../../data';
 import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
 import VirtualList from 'rc-virtual-list';
 import DiaryDetail from '../DiaryDetail';
 import SUserInfo from '../SUserInfo';
+import CommentList from '../CommentList';
+import { followedDirays, formatTimestamp } from '../../service';
 
 
 const detailUrl = 'https://api.jijigugu.club/album/detail';
@@ -22,7 +24,6 @@ const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
 
 const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ album, title, uid }) => {
 
-
     const [open, setOpen] = useState(false);
     const showModal = () => {
         albumLastScore.current = null;
@@ -33,20 +34,6 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
         setAlbums([]);
         setOpen(false);
     };
-
-    function formatTimestamp(timestamp: number) {
-        if (timestamp == 0) {
-            return '未知';
-        }
-        const date = new Date(timestamp);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的  
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    }
 
     const [albums, setAlbums] = useState<Diary[]>([]);
     const albumLastScore: any = useRef();
@@ -100,19 +87,32 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
         actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.score}</Tag>);
         actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.mood.name}</Tag>);
         actions.push(
+            <a
+                style={{ color: 'inherit' }}
+                onClick={() => { followedDirays.add(diary); }}
+            >
+                {React.createElement(StarOutlined)}
+            </a>
+        );
+        actions.push(
             <IconText
                 icon={LikeOutlined}
                 text={diary.likedNum ? '' + diary.likedNum : '0'}
                 key="list-vertical-like-o"
             />
         );
-        actions.push(
-            <IconText
-                icon={MessageOutlined}
-                text={diary.commentedNum ? '' + diary.commentedNum : '0'}
-                key="list-vertical-message"
-            />
-        );
+        if (diary.isCommentOpen) {
+            actions.push(
+                <CommentList did={diary.id}
+                    tigger={
+                        <IconText
+                            icon={MessageOutlined}
+                            text={diary.commentedNum ? '' + diary.commentedNum : '0'}
+                            key="list-vertical-message"
+                        />
+                    }
+                />);
+        }
         actions.push(
             <SUserInfo
                 sUser={convertToSUser(diary)}

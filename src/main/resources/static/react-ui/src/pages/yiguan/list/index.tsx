@@ -15,9 +15,11 @@ import QueryForm from './components/QueryForm';
 import DiaryList from './components/DiaryList';
 import StandardFormRow from './components/StandardFormRow';
 import ExportForm from './components/ExportForm';
+import FollowDiaryList from './components/FollowDiaryList';
 import type { Diary } from './data.d';
 import useStyles from './style.style';
 import { request } from '@umijs/max';
+import { followedDirays } from './service';
 
 const FormItem = Form.Item;
 
@@ -47,6 +49,7 @@ const Diaries: FC = () => {
   const [list, setList] = useState<Diary[]>([]);
   const [sUseList, setSUseList] = useState<Diary[]>([]);
   const [albumList, setAlbumList] = useState<Diary[]>([]);
+
   const lastScore = useRef(0);
   const appendData = () => {
     request(url + '/yiguan/listNew', {
@@ -180,6 +183,7 @@ const Diaries: FC = () => {
                 removeDiaryList={(count) => { setAlbumList(albumList.slice(count)); }}
               />
             </Modal>
+            <FollowDiaryList />
             <Button
               style={{ "margin": '0 10px 0 10px' }}
               onClick={() => {

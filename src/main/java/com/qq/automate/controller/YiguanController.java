@@ -41,6 +41,10 @@ public class YiguanController {
     public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO) {
         return yiguanService.setQueryListParams(yiguanQueryListParamsVO);
     }
+    @GetMapping("/isSUser")
+    public Result isSUser(String uid) {
+        return yiguanSUserService.isSUser(uid);
+    }
 
     @GetMapping("/listSUsers")
     public Result listSUsers() {

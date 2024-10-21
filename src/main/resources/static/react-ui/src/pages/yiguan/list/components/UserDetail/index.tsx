@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useModel } from 'umi';
 import { Tooltip, Avatar, Modal, Card, message, List, Tag, Col, Row, Button, Space } from 'antd';
-import { LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { SUser, Diary } from '../../data';
 import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
@@ -9,6 +9,8 @@ import VirtualList from 'rc-virtual-list';
 import AlbumDetail from '../AlbumDetail';
 import DiaryDetail from '../DiaryDetail';
 import SUserInfo from '../SUserInfo';
+import CommentList from '../CommentList';
+import { followedDirays, formatTimestamp } from '../../service';
 
 type UserInfo = {
     id: string;
@@ -40,6 +42,9 @@ type photo = {
     height: number;
     hash: any;
 }
+
+// const baseUrl = 'http://localhost:8001';
+const baseUrl = '';
 
 
 const detailUrl = 'https://api.jijigugu.club/realProfile/get';
@@ -73,6 +78,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
 
     const [userInfo, setUserInfo] = useState<UserInfo>();
     const [load, setLoad] = useState<boolean>(true);
+    const [s, setS] = useState<boolean>(false);
     function init() {
         setData([]);
         request(detailUrl, {
@@ -82,6 +88,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
         }).then(function (res) {
             if (res.code == 0) {
                 setUserInfo(res.data);
+                isSUser(userId);
                 setLoad(false);
                 appendData();
             } else if (res.code == 8) {
@@ -103,15 +110,17 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
         });
     }
 
-    function formatTimestamp(timestamp: number) {
-        const date = new Date(timestamp);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    function isSUser(uid: string) {
+        request(baseUrl + "/yiguan/isSUser", {
+            params: { 'uid': uid },
+            skipErrorHandler: true,
+        }).then(function (res) {
+            if (res.code == 1) {
+                setS(res.data);
+            } else {
+                message.error(res.message);
+            }
+        });
     }
 
     const [data, setData] = useState<Diary[]>([]);
@@ -144,21 +153,32 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
         actions.push(<Tag color='white' style={{ color: 'black' }}>{formatTimestamp(diary.createTime * 1000)}</Tag>);
         actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.mood.name}</Tag>);
         actions.push(
+            <a
+                style={{ color: 'inherit' }}
+                onClick={() => { followedDirays.add(diary); }}
+            >
+                {React.createElement(StarOutlined)}
+            </a>
+        );
+        actions.push(
             <IconText
                 icon={LikeOutlined}
                 text={diary.likedNum ? '' + diary.likedNum : '0'}
                 key="list-vertical-like-o"
             />
         );
-        actions.push(
-            <a onClick={() => { console.log(1) }}>
-                <IconText
-                    icon={MessageOutlined}
-                    text={diary.commentedNum ? '' + diary.commentedNum : '0'}
-                    key="list-vertical-message"
-                />
-            </a>
-        );
+        if (diary.isCommentOpen) {
+            actions.push(
+                <CommentList did={diary.id}
+                    tigger={
+                        <IconText
+                            icon={MessageOutlined}
+                            text={diary.commentedNum ? '' + diary.commentedNum : '0'}
+                            key="list-vertical-message"
+                        />
+                    }
+                />);
+        }
         if (diary.album) {
             actions.push(
                 <AlbumDetail album={diary.album} title={diary.album.title || "罐头专辑"} uid={diary.user.id} />
@@ -243,6 +263,15 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                                 <p>罐头数量：{userInfo?.realDiaryNum}</p>
                                 <p>星座：{userInfo?.constellation}</p>
                                 <p>粉丝：{userInfo?.followedNum}</p>
+                                {
+                                    s
+                                    &&
+                                    <SUserInfo
+                                        sUser={{ uid: userId }}
+                                        trigger={<Tag color="#f50">S</Tag>}
+                                        isInit={false}
+                                    />
+                                }
                             </div>
                         </Col>
                     </Row>

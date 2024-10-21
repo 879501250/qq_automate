@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { UserOutlined } from '@ant-design/icons';
+import { MessageOutlined, StarOutlined } from '@ant-design/icons';
 import {
     Button,
     Avatar,
@@ -12,6 +12,8 @@ import { Diary, SUser } from '../../data';
 import SUserInfo from '../SUserInfo';
 import AlbumDetail from '../AlbumDetail';
 import DiaryDetail from '../DiaryDetail';
+import CommentList from '../CommentList';
+import { followedDirays } from '../../service';
 
 // const url = 'http://localhost:8001';
 const url = '';
@@ -32,6 +34,17 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
         const actions: React.ReactNode[] = [];
         actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.id}</Tag>);
         actions.push(<Tag color='white' style={{ color: 'black' }}>{diary.score}</Tag>);
+        actions.push(
+            <a
+                style={{ color: 'inherit' }}
+                onClick={() => { followedDirays.add(diary);console.log(followedDirays) }}
+            >
+                {React.createElement(StarOutlined)}
+            </a>
+        );
+        if (diary.isCommentOpen) {
+            actions.push(<CommentList did={diary.id} tigger={React.createElement(MessageOutlined)} />);
+        }
         if (diary.album) {
             actions.push(
                 <AlbumDetail album={diary.album} title={diary.album.title || '罐头专辑'} uid={diary.user.id} />
@@ -41,7 +54,7 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
             actions.push(
                 <SUserInfo
                     sUser={convertToSUser(diary)}
-                    trigger={<Button >详情</Button>}
+                    trigger={<Button>详情</Button>}
                     isInit={true}
                 />
             );

@@ -11,6 +11,7 @@ export interface Diary {
   isSUser: boolean;
   likedNum?: number;
   commentedNum?: number;
+  isCommentOpen: boolean;
 }
 
 export type User = {
@@ -19,7 +20,7 @@ export type User = {
   gender: string;
   nickname: string;
   ipLocation: string;
-  avatar: string;
+  avatar: string | any;
 };
 
 export type Album = {

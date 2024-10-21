@@ -29,6 +29,8 @@ public class YiguanDiaryVO {
     private YiguanUserVO user;
     // 专辑信息
     private YiguanAlbumVO album;
+    // 是否开启评论区
+    private Boolean isCommentOpen;
     // 是否是 suser
     private Boolean isSUser;
 }
