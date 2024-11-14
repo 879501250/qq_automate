@@ -1,11 +1,11 @@
 import { useState, FC } from 'react';
-import { formatTimestamp, followedDirays } from '../../service';
+import { formatTimestamp, followedDirays } from '../../../common/service';
 import {
     Button,
     Modal,
 } from 'antd';
 import DiaryList from '../DiaryList';
-import type { Diary } from '../../data.d';
+import type { Diary } from '../../../common/data';
 
 const FollowDiaryList: FC = () => {
 

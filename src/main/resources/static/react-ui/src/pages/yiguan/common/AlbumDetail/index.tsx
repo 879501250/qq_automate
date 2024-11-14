@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, Modal, Card, Tooltip, List, Tag, Col, Row, message, Space } from 'antd';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
-import { Album, Diary, SUser } from '../../data';
+import { Album, Diary, SUser } from '../data';
 import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
 import VirtualList from 'rc-virtual-list';
 import DiaryDetail from '../DiaryDetail';
 import SUserInfo from '../SUserInfo';
 import CommentList from '../CommentList';
-import { followedDirays, formatTimestamp } from '../../service';
+import { followedDirays, formatTimestamp } from '../service';
 
 
 const detailUrl = 'https://api.jijigugu.club/album/detail';
@@ -117,7 +117,7 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
             <SUserInfo
                 sUser={convertToSUser(diary)}
                 trigger={<Button>详情</Button>}
-                isInit={true}
+                diaryId={diary.id}
             />
         );
         return actions;
@@ -214,7 +214,6 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
                                         diary={diary}
                                         index={index}
                                         actions={getActions(diary, index)}
-                                        enableMeta={false}
                                         photos={diary.photos.map((photo) => photo.url)}
                                     />
                                 </div>

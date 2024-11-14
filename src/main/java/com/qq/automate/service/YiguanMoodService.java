@@ -19,4 +19,6 @@ public interface YiguanMoodService extends IService<YiguanMood> {
 
     // 获取所有情绪之海信息
     Result listAllMood();
+
+    Result refreshMood();
 }

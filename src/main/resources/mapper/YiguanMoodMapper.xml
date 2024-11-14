@@ -10,4 +10,16 @@
         <result column="create_time" property="createTime" />
     </resultMap>
 
+    <update id="updateAll"  parameterType="java.util.List">
+        <foreach collection="list" item="mood" index="index" open="" close="" separator=";">
+            update yiguan_mood
+            <set>
+                id = #{mood.id}
+            </set>
+            <where>
+                name = #{mood.name}
+            </where>
+        </foreach>
+    </update>
+
 </mapper>

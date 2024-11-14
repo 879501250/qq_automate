@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { Input, Modal, Card, List, Tag, Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import { User, } from '../../data';
+import { User, } from '../data';
 import { request } from '@umijs/max';
 import VirtualList from 'rc-virtual-list';
 import UserDetail from '../UserDetail';
-import { formatTimestamp } from '../../service';
+import { formatTimestamp } from '../service';
 
 type Comment = {
     id: string;
@@ -126,14 +126,16 @@ const CommentList: React.FC<{ did: string, tigger: JSX.Element }> = ({ did, tigg
                                 >
                                     <List.Item.Meta
                                         avatar={
-                                            <Avatar
-                                                src={
-                                                    comment.user.avatar ?
-                                                        (photoUrl + comment.user.avatar.key) : ''
-                                                }
-                                                icon={<UserOutlined />}
-                                                size="small"
-                                            />
+                                            comment.user.avatar ?
+                                                <Avatar
+                                                    src={photoUrl + comment.user.avatar.key}
+                                                    size="small"
+                                                />
+                                                :
+                                                <Avatar
+                                                    icon={<UserOutlined />}
+                                                    size="small"
+                                                />
                                         }
                                         title={
                                             comment.user.id ?

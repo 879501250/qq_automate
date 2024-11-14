@@ -96,7 +96,7 @@ export async function getInitialState(): Promise<{
   //   }
   //   return undefined;
   // };
-
+  console.log(123)
   return {
     fetchUserInfo,
     refreshYiguanYgt,

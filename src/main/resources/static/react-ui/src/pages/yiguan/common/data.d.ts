@@ -1,6 +1,8 @@
 export interface Diary {
   id: string;
   text: string;
+  age?: string;
+  gender?: string;
   photos: any[] | string[];
   createTime: number;
   mood: string | any;
@@ -25,6 +27,7 @@ export type User = {
 
 export type Album = {
   id: string;
+  uid?: string;
   title?: string;
   photo?: string;
   diaryNum?: number;

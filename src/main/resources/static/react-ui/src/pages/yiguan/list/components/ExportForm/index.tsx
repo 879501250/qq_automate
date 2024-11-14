@@ -1,8 +1,6 @@
-import React, { useState, useEffect, ReactNode } from 'react';
-import { Button, Modal, Form, Input, Checkbox, Col, Row, Tooltip, message } from 'antd';
-import { Diary } from '../../data';
-import PhotoCarousel from '../PhotoCarousel';
-import { request } from '@umijs/max';
+import React from 'react';
+import { Button, Form, message } from 'antd';
+import { Diary } from '../../../common/data';
 import {
     DrawerForm,
     ProFormCheckbox,

@@ -29,6 +29,11 @@ export default [
         name: '罐子集合',
         component: './yiguan/list',
       },
+      {
+        path: '/yiguan/mood',
+        name: '情绪之海',
+        component: './yiguan/mood',
+      },
     ],
   },
   {

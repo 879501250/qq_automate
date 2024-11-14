@@ -6,9 +6,9 @@ import {
     Select,
     Switch,
 } from 'antd';
-import { Mood, Diary } from '../../data';
-import StandardFormRow from '../StandardFormRow';
-import TagSelect from '../TagSelect';
+import { Mood, Diary } from '../../../common/data';
+import StandardFormRow from '../../../common/StandardFormRow';
+import TagSelect from '../../../common/TagSelect';
 import { request } from '@umijs/max';
 
 type QueryParams = {
@@ -87,7 +87,6 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
                                     copy[key as keyof QueryParams] = changeValues[key];
                                 }
                             })
-                            console.log(copy);
                             setQueryParams(copy);
                         }}
                 >

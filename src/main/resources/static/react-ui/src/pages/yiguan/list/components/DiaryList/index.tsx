@@ -1,19 +1,21 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React from 'react';
 import { MessageOutlined, StarOutlined } from '@ant-design/icons';
 import {
     Button,
-    Avatar,
     Tag,
     List,
     Input,
+    Avatar,
 } from 'antd';
 import VirtualList from 'rc-virtual-list';
-import { Diary, SUser } from '../../data';
-import SUserInfo from '../SUserInfo';
-import AlbumDetail from '../AlbumDetail';
-import DiaryDetail from '../DiaryDetail';
-import CommentList from '../CommentList';
-import { followedDirays } from '../../service';
+import { UserOutlined } from '@ant-design/icons';
+import { Diary, SUser } from '../../../common/data';
+import SUserInfo from '../../../common/SUserInfo';
+import AlbumDetail from '../../../common/AlbumDetail';
+import DiaryDetail from '../../../common/DiaryDetail';
+import CommentList from '../../../common/CommentList';
+import { followedDirays } from '../../../common/service';
+import UserDetail from '../../../common/UserDetail';
 
 // const url = 'http://localhost:8001';
 const url = '';
@@ -37,7 +39,7 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
         actions.push(
             <a
                 style={{ color: 'inherit' }}
-                onClick={() => { followedDirays.add(diary);console.log(followedDirays) }}
+                onClick={() => { followedDirays.add(diary); console.log(followedDirays) }}
             >
                 {React.createElement(StarOutlined)}
             </a>
@@ -55,7 +57,7 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
                 <SUserInfo
                     sUser={convertToSUser(diary)}
                     trigger={<Button>详情</Button>}
-                    isInit={true}
+                    diaryId={diary.id}
                 />
             );
         }
@@ -101,7 +103,39 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
                             diary={diary}
                             index={index}
                             actions={getActions(diary, index)}
-                            enableMeta={true}
+                            metaData={<List.Item.Meta
+                                avatar={
+                                    diary.user.avatar ?
+                                        <Avatar
+                                            src={diary.user.avatar}
+                                            size={64} />
+                                        :
+                                        <Avatar
+                                            icon={<UserOutlined />}
+                                            size={64} />
+                                }
+                                title={
+                                    <div>
+                                        <UserDetail userId={diary.user.id} title={diary.user.nickname} />
+                                    </div>
+                                }
+                                description={
+                                    <span>
+                                        <Tag>#{index}</Tag>
+                                        {
+                                            diary.isSUser
+                                            &&
+                                            <SUserInfo
+                                                sUser={{ uid: diary.user.id }}
+                                                trigger={<Tag color="#f50">S</Tag>}
+                                            />
+                                        }
+                                        <Tag>{diary.mood}</Tag>
+                                        {diary.user.age && <Tag>{diary.user.age}</Tag>}
+                                        {diary.ipLocation && <Tag>{diary.ipLocation}</Tag>}
+                                    </span>
+                                }
+                            />}
                         />
                     </div>
                 )}

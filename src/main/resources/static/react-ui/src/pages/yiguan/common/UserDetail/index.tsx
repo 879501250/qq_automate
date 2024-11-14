@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useModel } from 'umi';
 import { Tooltip, Avatar, Modal, Card, message, List, Tag, Col, Row, Button, Space } from 'antd';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
-import { SUser, Diary } from '../../data';
+import { SUser, Diary } from '../data';
 import PhotoCarousel from '../PhotoCarousel';
 import { request } from '@umijs/max';
 import VirtualList from 'rc-virtual-list';
@@ -10,7 +10,7 @@ import AlbumDetail from '../AlbumDetail';
 import DiaryDetail from '../DiaryDetail';
 import SUserInfo from '../SUserInfo';
 import CommentList from '../CommentList';
-import { followedDirays, formatTimestamp } from '../../service';
+import { followedDirays, formatTimestamp } from '../service';
 
 type UserInfo = {
     id: string;
@@ -189,7 +189,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                 <SUserInfo
                     sUser={convertToSUser(diary)}
                     trigger={<Button>详情</Button>}
-                    isInit={true}
+                    diaryId={diary.id}
                 />
             );
         }
@@ -215,7 +215,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
         return sUser;
     }
 
-    if (!userId) {
+    if (!userId || userId == '') {
         return <>{title}</>
     }
 
@@ -269,7 +269,6 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                                     <SUserInfo
                                         sUser={{ uid: userId }}
                                         trigger={<Tag color="#f50">S</Tag>}
-                                        isInit={false}
                                     />
                                 }
                             </div>
@@ -295,7 +294,6 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                                         diary={diary}
                                         index={index}
                                         actions={getActions(diary, index)}
-                                        enableMeta={false}
                                         photos={diary.photos.map((photo) => photo.url)}
                                     />
                                 </div>

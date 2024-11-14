@@ -13,13 +13,12 @@ import type { FC } from 'react';
 import React, { useState, useEffect, useRef } from 'react';
 import QueryForm from './components/QueryForm';
 import DiaryList from './components/DiaryList';
-import StandardFormRow from './components/StandardFormRow';
+import StandardFormRow from '../common/StandardFormRow';
 import ExportForm from './components/ExportForm';
 import FollowDiaryList from './components/FollowDiaryList';
-import type { Diary } from './data.d';
+import type { Diary } from '../common/data';
 import useStyles from './style.style';
 import { request } from '@umijs/max';
-import { followedDirays } from './service';
 
 const FormItem = Form.Item;
 
@@ -37,20 +36,13 @@ const contentStyle: React.CSSProperties = {
   background: '#364d79',
 };
 
-const Diaries: FC = () => {
+const List: FC = () => {
 
   const { loading } = useModel('@@initialState');
+  const { list, setList, sUseList, setSUseList, albumList, setAlbumList, lastScore } = useModel('yiguan.model');
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { styles } = useStyles();
-
-
-  const [list, setList] = useState<Diary[]>([]);
-  const [sUseList, setSUseList] = useState<Diary[]>([]);
-  const [albumList, setAlbumList] = useState<Diary[]>([]);
-
-  const lastScore = useRef(0);
   const appendData = () => {
     request(url + '/yiguan/listNew', {
       params: { 'lastScore': lastScore.current, },
@@ -239,4 +231,4 @@ const Diaries: FC = () => {
   );
 };
 
-export default Diaries;
+export default List;

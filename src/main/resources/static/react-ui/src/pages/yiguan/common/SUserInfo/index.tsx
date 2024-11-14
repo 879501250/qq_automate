@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Tooltip, message, Tag } from 'antd';
-import { SUser } from '../../data';
+import { SUser } from '../data';
 import PhotoCarousel from '../PhotoCarousel';
 import UserDetail from '../UserDetail';
 import AlbumDetail from '../AlbumDetail';
@@ -10,19 +10,20 @@ import {
     ProFormDateTimePicker,
     ProForm,
     ProFormTextArea,
-    CheckCard,
 } from '@ant-design/pro-components';
 
 // const baseUrl = 'http://localhost:8001';
 const baseUrl = '';
 
+const diaryDetailUrl = 'https://api.jijigugu.club/diary/detail';
 
-const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean }> = ({ sUser, trigger, isInit }) => {
+
+const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, diaryId?: string }> = ({ sUser, trigger, diaryId }) => {
 
     const [sUserDetail, setSUserDetail] = React.useState<SUser>();
 
     useEffect(() => {
-        if (!isInit) {
+        if (!diaryId) {
             request(baseUrl + '/yiguan/getSUserById', {
                 params: { 'uid': sUser.uid, },
                 skipErrorHandler: true,
@@ -47,16 +48,30 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
         setSelectedPhotos(nextSelectedPhotos);
     };
 
+    const [ipLocation, setIpLocation] = React.useState<string>('详情');
     function openChange(open: boolean) {
         if (open) {
-
+            if (diaryId) {
+                request(diaryDetailUrl, {
+                    params: { 'id': diaryId, },
+                    skipErrorHandler: true,
+                }).then(function (res) {
+                    if (res.code == 0) {
+                        if (res.data.ipLocation) {
+                            setIpLocation(res.data.ipLocation);
+                        }
+                    } else {
+                        message.error(res.msg);
+                    }
+                });
+            }
         }
     }
 
     return (
         <>
             <ModalForm<SUser>
-                title="详情"
+                title={ipLocation}
                 trigger={trigger}
                 initialValues={{
                     diaryText: sUserDetail?.diaryText,
@@ -64,7 +79,7 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                 }}
                 submitter={{
                     searchConfig: {
-                        submitText: isInit ? '添加' : '更新',
+                        submitText: diaryId ? '添加' : '更新',
                         resetText: '取消',
                     },
                 }}
@@ -75,7 +90,7 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, isInit: boolean 
                     values.albumIds = sUserDetail?.albumIds;
                     let code = 0;
                     let url;
-                    if (isInit) {
+                    if (diaryId) {
                         url = baseUrl + '/yiguan/addSUser';
                     } else {
                         url = baseUrl + '/yiguan/updateSUser';

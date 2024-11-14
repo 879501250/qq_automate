@@ -32,6 +32,11 @@ public class YiguanController {
         return yiguanMoodService.listAllMood();
     }
 
+    @GetMapping("/refreshMood")
+    public Result refreshMood() {
+        return yiguanMoodService.refreshMood();
+    }
+
     @GetMapping("/listNew")
     public Result listNew(Long lastScore) {
         return yiguanService.listNew(lastScore);

@@ -1,7 +1,6 @@
-import { Diary } from './data.d';
+import { Diary } from './data';
 
 export const followedDirays = new Set<Diary>();
-
 
 export function formatTimestamp(timestamp: number) {
   if (timestamp == 0) {
