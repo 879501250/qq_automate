@@ -92,6 +92,25 @@ const List: FC = () => {
     reader.readAsText(file);
   }
 
+  function cleanDiary(SUserDiaryIndex: number, albumDiaryIndex: number) {
+    if (SUserDiaryIndex >= 0 || albumDiaryIndex >= 0) {
+      for (let n = 0; n < list.length; n++) {
+        if (SUserDiaryIndex >= 0) {
+          if (list[n].id == sUseList[SUserDiaryIndex].id) {
+            setList(list.slice(n));
+            break;
+          }
+        }
+        if (albumDiaryIndex >= 0) {
+          if (list[n].id == albumList[albumDiaryIndex].id) {
+            setList(list.slice(n));
+            break;
+          }
+        }
+      }
+    }
+  }
+
   const saveCallBack: any = useRef();
   useEffect(() => {
     saveCallBack.current = appendData;
@@ -146,14 +165,17 @@ const List: FC = () => {
               open={sUserModal}
               onCancel={() => { setSUserModal(false) }}
               footer={[
-                <Button onClick={() => { setSUseList([]); }}>
+                <Button onClick={() => { cleanDiary(-1, albumList.length - 1); setSUseList([]); }}>
                   清空
                 </Button>,
               ]}
             >
               <DiaryList
                 diaryList={sUseList}
-                removeDiaryList={(count) => { setSUseList(sUseList.slice(count)); }}
+                removeDiaryList={(count) => {
+                  cleanDiary(count - 1, albumList.length - 1);
+                  setSUseList(sUseList.slice(count));
+                }}
               />
             </Modal>
             <Button style={{ "margin": '0 10px 0 10px' }} onClick={() => { setAlbumModal(true) }}>
@@ -165,14 +187,17 @@ const List: FC = () => {
               open={albumModal}
               onCancel={() => { setAlbumModal(false) }}
               footer={[
-                <Button onClick={() => { setAlbumList([]); }}>
+                <Button onClick={() => { cleanDiary(sUseList.length - 1, - 1); setAlbumList([]); }}>
                   清空
                 </Button>,
               ]}
             >
               <DiaryList
                 diaryList={albumList}
-                removeDiaryList={(count) => { setAlbumList(albumList.slice(count)); }}
+                removeDiaryList={(count) => {
+                  cleanDiary(sUseList.length - 1, count - 1);
+                  setAlbumList(albumList.slice(count));
+                }}
               />
             </Modal>
             <FollowDiaryList />
