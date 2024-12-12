@@ -49,7 +49,15 @@ const MoodList: FC = () => {
         actions.push(
             <a
                 style={{ color: 'inherit' }}
-                onClick={() => { followedDirays.add(diary); }}
+                onClick={() => {
+                    diary.mood = diary.mood.name;
+                    if (diary.user.avatar) {
+                        diary.user.avatar = photoUrl + diary.user.avatar.key;
+                    }
+                    diary.photos = diary.photos.map((photo) => photo.url);
+                    diary.score = formatTimestamp(diary.createTime * 1000);
+                    followedDirays.add(diary);
+                }}
             >
                 {React.createElement(StarOutlined)}
             </a>
@@ -262,12 +270,14 @@ const MoodList: FC = () => {
                                     diary={diary}
                                     index={index}
                                     actions={getActions(diary, index)}
-                                    photos={diary.photos.map((photo) => photo.url)}
+                                    photos={diary.photos.map((photo) => photo.url ? photo.url : photo)}
                                     metaData={<List.Item.Meta
                                         avatar={
                                             diary.user.avatar ?
                                                 <Avatar
-                                                    src={photoUrl + diary.user.avatar.key}
+                                                    src={diary.user.avatar.key
+                                                        ? photoUrl + diary.user.avatar.key
+                                                        : diary.user.avatar}
                                                     size={64} />
                                                 :
                                                 <Avatar
