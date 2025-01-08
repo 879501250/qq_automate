@@ -1,7 +1,7 @@
 import React, { useState, useRef, FC, useEffect } from 'react';
 import { useModel } from 'umi';
 import { request } from '@umijs/max';
-import { Select, Avatar, Card, Form, List, Tag, Button, Space } from 'antd';
+import { Select, Avatar, Card, Form, List, Tag, Button, Space, Input } from 'antd';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { Diary, Mood, SUser } from '../common/data';
 import VirtualList from 'rc-virtual-list';
@@ -21,6 +21,7 @@ type QueryParams = {
     mid: string;
     gender: string;
     age: string;
+    initialize: boolean;
 }
 
 const listUrl = 'https://api.jijigugu.club/feed/list';
@@ -94,6 +95,21 @@ const MoodList: FC = () => {
                 diaryId={diary.id}
             />
         );
+        actions.push(
+            <Button
+                onClick={() => {
+                    setInitialQueryParams({
+                        ...initialQueryParams,
+                        socre: diary.score,
+                    });
+                    form.setFieldsValue({
+                        socre: diary.score,
+                    });
+                }}
+            >
+                标记
+            </Button>
+        );
         return actions;
     }
 
@@ -132,6 +148,7 @@ const MoodList: FC = () => {
         mid: initialQueryParams.mood,
         gender: encodeURIValue(initialQueryParams.gender, ['1', '2'], false),
         age: encodeURIValue(ages, ages, true),
+        initialize: true,
     });
 
     useEffect(() => {
@@ -140,13 +157,22 @@ const MoodList: FC = () => {
 
     function refresh() {
         setData([]);
-        userLastScore.current = null;
+        if (!queryParams.initialize) {
+            setInitialQueryParams({
+                ...initialQueryParams,
+                socre: '',
+            });
+            userLastScore.current = '';
+            form.setFieldsValue({
+                socre: '',
+            });
+        }
         appendData(true);
     }
 
-    const userLastScore: any = useRef();
+    const userLastScore: any = useRef(initialQueryParams.socre);
     const appendData = (init: boolean) => {
-        const url = listUrl + '?lastScore=' + (userLastScore.current == null ? '' : userLastScore.current)
+        const url = listUrl + '?lastScore=' + userLastScore.current
             + '&mid=' + queryParams.mid
             + '&gender=' + queryParams.gender
             + '&age=' + queryParams.age;
@@ -200,24 +226,14 @@ const MoodList: FC = () => {
                                 mid: values.mood,
                                 gender: encodeURIValue(values.gender, ['1', '2'], false),
                                 age: encodeURIValue(values.age, ages, true),
+                                initialize: false,
                             });
                         }
                     }
                 >
-                    {/* <StandardFormRow title="ip" block style={{ paddingBottom: 11 }}>
-                        <FormItem name="ip">
-                            <TagSelect expandable>
-                                {(initialState?.chinaProvinces || []).map((value, index) => (
-                                    <TagSelect.Option value={value} key={value}>
-                                        {value}
-                                    </TagSelect.Option>
-                                ))}
-                            </TagSelect>
-                        </FormItem>
-                    </StandardFormRow> */}
                     <FormItem label="情绪之海" name="mood" style={{ float: 'left' }}>
                         <Select
-                            style={{ width: 150 }}
+                            style={{ width: 100 }}
                             showSearch
                             optionFilterProp="label"
                             options={
@@ -229,7 +245,7 @@ const MoodList: FC = () => {
                     </FormItem>
                     <FormItem label="性别" name="gender" style={{ float: 'left' }}>
                         <Select
-                            style={{ width: 150 }}
+                            style={{ width: 125 }}
                             mode="multiple"
                             options={[
                                 { value: '1', label: '男' },
@@ -249,7 +265,19 @@ const MoodList: FC = () => {
                             }
                         />
                     </FormItem>
-                    <Button type="primary" onClick={refresh}>刷新</Button>
+                    <FormItem label="socre" name="socre" style={{ float: 'left' }}>
+                        <Input style={{ width: 200 }} disabled={true} />
+                    </FormItem>
+                    <Button type="primary"
+                        onClick={() => {
+                            setQueryParams({
+                                ...queryParams,
+                                initialize: false,
+                            });
+                        }}
+                    >
+                        刷新
+                    </Button>
                 </Form>
             </Card >
             <Card

@@ -57,7 +57,7 @@ const List: FC = () => {
           data.diaries.forEach((diary: Diary) => {
             if (diary.isSUser) {
               sUsers.push(diary);
-            } else if (diary.album) {
+            } else if (diary.album && !diary.user.avatar) { // 专辑太多了，所以只看匿名张专辑
               albums.push(diary);
             }
           })
@@ -179,7 +179,7 @@ const List: FC = () => {
               />
             </Modal>
             <Button style={{ "margin": '0 10px 0 10px' }} onClick={() => { setAlbumModal(true) }}>
-              专辑
+              匿名专辑
             </Button>
             <Modal
               title={albumList.length}

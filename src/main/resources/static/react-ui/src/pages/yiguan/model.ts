@@ -14,6 +14,7 @@ export default function Page() {
         gender: ['2'],
         mood: '',
         age: ['05+', '00+', '95+', '90+', '85+', '80+', '80-'],
+        socre: '',
     });
     if (!loading && initialQueryParams.mood == '') {
         const moods: Mood[] = initialState?.moods || [];
