@@ -13,15 +13,11 @@ import SUserInfo from '../common/SUserInfo';
 import CommentList from '../common/CommentList';
 import UserDetail from '../common/UserDetail';
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 const ContainerHeight = 700;
 type QueryParams = {
     mid: string;
     gender: string;
     age: string;
-    initialize: boolean;
 }
 
 const listUrl = 'https://api.jijigugu.club/feed/list';
@@ -148,7 +144,6 @@ const MoodList: FC = () => {
         mid: initialQueryParams.mood,
         gender: encodeURIValue(initialQueryParams.gender, ['1', '2'], false),
         age: encodeURIValue(ages, ages, true),
-        initialize: true,
     });
 
     useEffect(() => {
@@ -157,16 +152,6 @@ const MoodList: FC = () => {
 
     function refresh() {
         setData([]);
-        if (!queryParams.initialize) {
-            setInitialQueryParams({
-                ...initialQueryParams,
-                socre: '',
-            });
-            userLastScore.current = '';
-            form.setFieldsValue({
-                socre: '',
-            });
-        }
         appendData(true);
     }
 
@@ -219,14 +204,17 @@ const MoodList: FC = () => {
                                 mood: values.mood,
                                 gender: values.gender,
                                 age: values.age,
+                                socre: '',
                             });
-
+                            userLastScore.current = '';
+                            form.setFieldsValue({
+                                socre: '',
+                            });
                             setQueryParams({
                                 ...queryParams,
                                 mid: values.mood,
                                 gender: encodeURIValue(values.gender, ['1', '2'], false),
                                 age: encodeURIValue(values.age, ages, true),
-                                initialize: false,
                             });
                         }
                     }
@@ -270,10 +258,15 @@ const MoodList: FC = () => {
                     </FormItem>
                     <Button type="primary"
                         onClick={() => {
-                            setQueryParams({
-                                ...queryParams,
-                                initialize: false,
+                            setInitialQueryParams({
+                                ...initialQueryParams,
+                                socre: '',
                             });
+                            userLastScore.current = '';
+                            form.setFieldsValue({
+                                socre: '',
+                            });
+                            refresh();
                         }}
                     >
                         刷新
