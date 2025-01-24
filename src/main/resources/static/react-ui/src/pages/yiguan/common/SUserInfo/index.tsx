@@ -17,15 +17,23 @@ const baseUrl = '';
 
 const diaryDetailUrl = 'https://api.jijigugu.club/diary/detail';
 
+interface SUserProps {
+    sUser?: SUser;
+    trigger: JSX.Element;
+    diaryId?: string;
+    uid?: string;
+}
 
-const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, diaryId?: string }> = ({ sUser, trigger, diaryId }) => {
+const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
 
     const [sUserDetail, setSUserDetail] = React.useState<SUser>();
 
     useEffect(() => {
-        if (!diaryId) {
+        if (sUser) {
+            setSUserDetail(sUser);
+        } else if (uid) {
             request(baseUrl + '/yiguan/getSUserById', {
-                params: { 'uid': sUser.uid, },
+                params: { 'uid': uid, },
                 skipErrorHandler: true,
             }).then(function (res) {
                 if (res.code == 1) {
@@ -35,8 +43,6 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, diaryId?: string
                     message.error(res.message);
                 }
             });
-        } else {
-            setSUserDetail(sUser);
         }
     }, []);
 
@@ -85,6 +91,10 @@ const SUserInfo: React.FC<{ sUser: SUser, trigger: JSX.Element, diaryId?: string
                 }}
                 onOpenChange={openChange}
                 onFinish={async (values) => {
+                    if (!sUser) {
+                        message.error('uid 不存在');
+                        return;
+                    }
                     values.uid = sUser.uid;
                     values.photos = selectedPhotos?.join(",");
                     values.albumIds = sUserDetail?.albumIds;

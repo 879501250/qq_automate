@@ -126,7 +126,7 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
                                             diary.isSUser
                                             &&
                                             <SUserInfo
-                                                sUser={{ uid: diary.user.id }}
+                                                uid={diary.user.id}
                                                 trigger={<Tag color="#f50">S</Tag>}
                                             />
                                         }

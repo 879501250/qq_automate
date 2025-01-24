@@ -34,6 +34,11 @@ export default [
         name: '情绪之海',
         component: './yiguan/mood',
       },
+      {
+        path: '/yiguan/suser',
+        name: 'suser',
+        component: './yiguan/suser',
+      },
     ],
   },
   {

@@ -51,7 +51,18 @@ type SUser = {
   lastActiveTime?: string;
 };
 
+export type TableListPagination = {
+  total: number;
+  pageSize: number;
+  current: number;
+};
 
+type Result = {
+  success: boolean;
+  code: number;
+  message: string;
+  data: any;
+};
 
 
 export type Member = {

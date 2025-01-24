@@ -98,7 +98,7 @@ const TableList: React.FC = () => {
     {
       title: '规则名称',
       dataIndex: 'name',
-      tip: '规则名称是唯一的 key',
+      // tip: '规则名称是唯一的 key',
       render: (dom, entity) => {
         return (
           <a

@@ -267,7 +267,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                                     s
                                     &&
                                     <SUserInfo
-                                        sUser={{ uid: userId }}
+                                        uid={userId}
                                         trigger={<Tag color="#f50">S</Tag>}
                                     />
                                 }
