@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "ignoreDeprecations": "5.0",
-    "suppressImplicitAnyIndexErrors": true,
+    // "suppressImplicitAnyIndexErrors": true,
     "declaration": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
