@@ -152,8 +152,16 @@ const MoodList: FC = () => {
 
     function refresh() {
         setData([]);
-        appendData(true);
     }
+
+    useEffect(() => {
+        if (data.length == 0) {
+            appendData(true);
+        } else if (data.length < 3) {
+            // 如果查到的数据不足以触发滚动查询，提前多查几次
+            appendData(false);
+        }
+    }, [data]);
 
     const userLastScore: any = useRef(initialQueryParams.socre);
     const appendData = (init: boolean) => {
