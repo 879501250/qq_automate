@@ -75,4 +75,29 @@ public class YiguanController {
     public Result getYgt(Boolean refresh) {
         return yiguanService.getYgt(refresh);
     }
+
+    @GetMapping("/startBackgroundQueryScheduler")
+    public Result startBackgroundQueryScheduler(Long lastScore,Long interval) {
+        return yiguanService.startBackgroundQueryScheduler(lastScore,interval);
+    }
+
+    @GetMapping("/stopBackgroundQueryScheduler")
+    public Result stopBackgroundQueryScheduler() {
+        return yiguanService.stopBackgroundQueryScheduler();
+    }
+
+    @GetMapping("/getBackgroundYiguanDiaryList")
+    public Result getBackgroundYiguanDiaryList() {
+        return yiguanService.getBackgroundYiguanDiaryList();
+    }
+
+    @GetMapping("/removeBackgroundYiguanDiary")
+    public Result removeBackgroundYiguanDiary(String id) {
+        return yiguanService.removeBackgroundYiguanDiary(id);
+    }
+
+    @GetMapping("/clearBackgroundYiguanDiary")
+    public Result clearBackgroundYiguanDiary() {
+        return yiguanService.clearBackgroundYiguanDiary();
+    }
 }

@@ -8,6 +8,8 @@ export default function Page() {
     const [albumList, setAlbumList] = useState<Diary[]>([]);
     const lastScore = useRef(0);
 
+    const [background, setBackground] = useState(true);
+
     const { initialState, loading } = useModel('@@initialState');
     const [initialQueryParams, setInitialQueryParams] = useState({
         ip: ['全部'],
@@ -32,6 +34,7 @@ export default function Page() {
         sUseList, setSUseList,
         albumList, setAlbumList,
         lastScore,
+        background, setBackground,
         initialQueryParams, setInitialQueryParams,
     };
 };

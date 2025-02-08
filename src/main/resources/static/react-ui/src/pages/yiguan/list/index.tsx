@@ -7,6 +7,7 @@ import {
   Upload,
   Button,
   Modal,
+  Switch,
 } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import type { FC } from 'react';
@@ -16,8 +17,8 @@ import DiaryList from './components/DiaryList';
 import StandardFormRow from '../common/StandardFormRow';
 import ExportForm from './components/ExportForm';
 import FollowDiaryList from './components/FollowDiaryList';
+import BackgroundDiaryList from './components/BackgroundDiaryList';
 import type { Diary } from '../common/data';
-import useStyles from './style.style';
 import { request } from '@umijs/max';
 
 const FormItem = Form.Item;
@@ -39,7 +40,12 @@ const contentStyle: React.CSSProperties = {
 const List: FC = () => {
 
   const { loading } = useModel('@@initialState');
-  const { list, setList, sUseList, setSUseList, albumList, setAlbumList, lastScore } = useModel('yiguan.model');
+  const { list, setList,
+    sUseList, setSUseList,
+    albumList, setAlbumList,
+    lastScore,
+    background, setBackground,
+  } = useModel('yiguan.model');
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -74,9 +80,46 @@ const List: FC = () => {
     });
   }
 
+  const backgroundRef = useRef(background);
+
   useEffect(() => {
+    if (backgroundRef.current) {
+      // 关闭后台查询任务
+      stopBackgroundQueryScheduler();
+    }
     appendData();
+    return () => {
+      // 开启后台查询任务
+      if (backgroundRef.current) {
+        startBackgroundQueryScheduler();
+      }
+    };
   }, []);
+
+  function startBackgroundQueryScheduler() {
+    request(url + '/yiguan/startBackgroundQueryScheduler', {
+      params: {
+        'lastScore': lastScore.current,
+        'interval': time,
+      },
+      skipErrorHandler: true,
+    }).then(function (res) {
+      if (res.code == 0) {
+        message.error(res.message);
+      }
+    });
+  }
+
+  function stopBackgroundQueryScheduler() {
+    request(url + '/yiguan/stopBackgroundQueryScheduler').then(function (res) {
+      if (res.code == 0) {
+        message.error(res.message);
+      } else if (res.code == 1) {
+        // 从后台查询的最新数据开始查询
+        lastScore.current = res.data.lastScore;
+      }
+    });
+  }
 
   function loadDiary(file: any) {
     const reader = new FileReader();
@@ -211,6 +254,10 @@ const List: FC = () => {
             >
               全部清空
             </Button>
+            <span>后台查询：</span>
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" checked={background}
+              onChange={(checked) => { setBackground(checked); backgroundRef.current = checked; }} />
+            <BackgroundDiaryList />
             <Upload
               beforeUpload={(file) => {
                 loadDiary(file);

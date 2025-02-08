@@ -9,4 +9,14 @@ public interface YiguanService {
     Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO);
 
     Result getYgt(Boolean refresh);
+
+    Result startBackgroundQueryScheduler(Long lastScore,Long interval);
+
+    Result stopBackgroundQueryScheduler();
+
+    Result getBackgroundYiguanDiaryList();
+
+    Result removeBackgroundYiguanDiary(String id);
+
+    Result clearBackgroundYiguanDiary();
 }

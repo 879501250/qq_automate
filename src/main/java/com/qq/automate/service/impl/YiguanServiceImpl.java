@@ -12,14 +12,18 @@ import com.qq.automate.common.result.Result;
 import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 
 @Service
 public class YiguanServiceImpl implements YiguanService {
@@ -27,16 +31,23 @@ public class YiguanServiceImpl implements YiguanService {
     @Autowired
     private YiguanSUserService yiguanSUserService;
 
+    @Autowired
+    private ScheduledTaskRegistrar scheduledTaskRegistrar;
 
     @Override
     public Result listNew(Long lastScore) {
         if (lastScore == null) {
             lastScore = 0L;
         }
+        List<YiguanDiaryVO> list = new LinkedList<>();
+        Long temp = addDiarys(list, lastScore, false);
+        return Result.success().data("diaries", list).data("lastScore", temp);
+    }
+
+    private Long addDiarys(List<YiguanDiaryVO> list, Long lastScore, boolean isBackgroundQuery) {
         String result = HttpRequest.get(YiguanConstant.YIGUAN_LIST_NEW_URL).execute().body();
         JSONObject jsonObject = JSONUtil.parseObj(result);
         JSONArray datas = jsonObject.getJSONArray("data");
-        ArrayList<YiguanDiaryVO> list = new ArrayList<>(datas.size());
         Long temp = lastScore;
         YiguanDiaryVO diaryVO;
         for (int i = datas.size() - 1; i >= 0; i--) {
@@ -47,7 +58,7 @@ public class YiguanServiceImpl implements YiguanService {
                 // 判断性别
                 Integer gender = data.getByPath("user.gender", Integer.class);
                 if (2 == gender) {
-                    diaryVO = filterDiary(data);
+                    diaryVO = filterDiary(data, isBackgroundQuery);
                     if (diaryVO != null) {
                         YiguanUserVO user = diaryVO.getUser();
                         if (user.getAvatar() != null) {
@@ -66,14 +77,20 @@ public class YiguanServiceImpl implements YiguanService {
                 temp = Math.max(temp, score);
             }
         }
-        return Result.success().data("diaries", list).data("lastScore", temp);
+        return temp;
     }
 
-    // 对罐头按查询条件进行筛选
-    private YiguanDiaryVO filterDiary(JSONObject data) {
+    /**
+     * 对罐头按查询条件进行筛选
+     *
+     * @param data
+     * @param isBackgroundQuery 是否是后台查询，后台查询时为防止数据过多，只筛选 suser 和匿名用户的专辑
+     * @return
+     */
+    private YiguanDiaryVO filterDiary(JSONObject data, boolean isBackgroundQuery) {
         YiguanDiaryVO diaryVO = JSONUtil.toBean(data, YiguanDiaryVO.class);
         Boolean isReal = data.getByPath("user.isReal", Boolean.class);
-        if (queryListParams == null) {
+        if (!isBackgroundQuery && queryListParams == null) {
             // 内容太多了，现在只看真身或者带专辑的罐头
             if (Boolean.FALSE.equals(isReal) && data.getJSONObject("album") == null) {
                 // 不是真身，也不包含专辑就不看
@@ -84,6 +101,7 @@ public class YiguanServiceImpl implements YiguanService {
         } else {
             String mood = data.getByPath("mood.name", String.class);
             diaryVO.setMood(mood);
+            // 是否可以获取到真身，即真身用户或带专辑的匿名用户
             if (isReal || data.getJSONObject("album") != null) {
                 YiguanUserVO user = diaryVO.getUser();
                 if (isReal) {
@@ -91,6 +109,7 @@ public class YiguanServiceImpl implements YiguanService {
                 } else {
                     user.setId(data.getByPath("album.uid", String.class));
                 }
+                // 是否是 suser
                 if (Boolean.TRUE.equals(yiguanSUserService.isSUser(user.getId()).getData())) {
                     diaryVO.setIsSUser(true);
                     yiguanSUserService.updateSUserLastActiveTime(user.getId(),
@@ -104,8 +123,12 @@ public class YiguanServiceImpl implements YiguanService {
                     if (!queryListParams.vaildateRealMoods(diaryVO)) {
                         diaryVO = null;
                     }
+                    // 如果是后台查询，只要匿名用户的罐头
+                    if (isBackgroundQuery && user.getAvatar() != null) {
+                        diaryVO = null;
+                    }
                 }
-            } else if (queryListParams.vaildateShadow()) {
+            } else if (!isBackgroundQuery && queryListParams.vaildateShadow()) {
                 if (!queryListParams.vaildateShadowMoods(diaryVO) && !queryListParams.vaildateContent(diaryVO)) {
                     diaryVO.setIpLocation(getIP(diaryVO.getId()));
                     if (!queryListParams.vaildateIp(diaryVO)) {
@@ -140,6 +163,96 @@ public class YiguanServiceImpl implements YiguanService {
             }
         }
         return Result.success().data(ygt);
+    }
+
+
+    private ScheduledTask backgroundQueryTask;
+    private static final BackgroundQueryData backgroundQueryData = new BackgroundQueryData();
+
+    @Override
+    public Result startBackgroundQueryScheduler(Long lastScore, Long interval) {
+        if (backgroundQueryTask != null) {
+            return Result.success().message("已存在运行中的后台查询任务~");
+        }
+        if (interval == null || interval < 0) {
+            interval = 1L;
+        }
+        backgroundQueryData.setLastScore(lastScore);
+        backgroundQueryTask = scheduledTaskRegistrar.scheduleFixedRateTask(
+                new FixedRateTask(() -> {
+                    backgroundQueryData.setLastScore(addDiarys(
+                            backgroundQueryData.getYiguanDiaryList(),
+                            backgroundQueryData.getLastScore(),
+                            true));
+                },
+                        Duration.ofSeconds(interval),
+                        Duration.ZERO));
+        System.out.println("开始执行后台查询任务~");
+        return Result.success().message("开始执行后台查询任务~");
+    }
+
+    private static class BackgroundQueryData {
+        Long lastScore;
+        LinkedList<YiguanDiaryVO> yiguanDiaryList;
+
+        BackgroundQueryData() {
+            lastScore = null;
+            yiguanDiaryList = new LinkedList<>();
+        }
+
+        public Long getLastScore() {
+            return lastScore;
+        }
+
+        public void setLastScore(Long lastScore) {
+            this.lastScore = lastScore;
+        }
+
+        public LinkedList<YiguanDiaryVO> getYiguanDiaryList() {
+            return yiguanDiaryList;
+        }
+
+        public void removeYiguanDiary(String id) {
+            while (!yiguanDiaryList.isEmpty()) {
+                YiguanDiaryVO yiguanDiaryVO = yiguanDiaryList.pollFirst();
+                if (id.equals(yiguanDiaryVO.getId())) {
+                    break;
+                }
+            }
+        }
+
+        public void clearData() {
+            yiguanDiaryList.clear();
+        }
+
+    }
+
+    @Override
+    public Result stopBackgroundQueryScheduler() {
+        if (backgroundQueryTask == null) {
+            return Result.success().code(2).message("暂无后台查询任务~");
+        }
+        backgroundQueryTask.cancel();
+        backgroundQueryTask = null;
+        System.out.println("后台查询任务已暂停~");
+        return Result.success().message("后台查询任务暂停成功~").data("lastScore", backgroundQueryData.getLastScore());
+    }
+
+    @Override
+    public Result getBackgroundYiguanDiaryList() {
+        return Result.success().data("diaries", backgroundQueryData.getYiguanDiaryList());
+    }
+
+    @Override
+    public Result removeBackgroundYiguanDiary(String id) {
+        backgroundQueryData.removeYiguanDiary(id);
+        return Result.success();
+    }
+
+    @Override
+    public Result clearBackgroundYiguanDiary() {
+        backgroundQueryData.clearData();
+        return Result.success().message("后台列表已清空~");
     }
 
     private void refreshYgt() {
