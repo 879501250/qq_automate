@@ -12,6 +12,7 @@ import DiaryDetail from '../common/DiaryDetail';
 import SUserInfo from '../common/SUserInfo';
 import CommentList from '../common/CommentList';
 import UserDetail from '../common/UserDetail';
+import FollowDiaryList from '../common/FollowDiaryList';
 
 const ContainerHeight = 700;
 type QueryParams = {
@@ -279,6 +280,7 @@ const MoodList: FC = () => {
                     >
                         刷新
                     </Button>
+                    <FollowDiaryList />
                 </Form>
             </Card >
             <Card

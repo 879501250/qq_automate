@@ -4,7 +4,7 @@ import {
     Modal,
     message,
 } from 'antd';
-import DiaryList from '../DiaryList';
+import DiaryList from '../../../common/DiaryList';
 import type { Diary } from '../../../common/data';
 import { request } from '@umijs/max';
 
