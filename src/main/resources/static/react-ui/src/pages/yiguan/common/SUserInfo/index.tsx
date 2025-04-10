@@ -31,6 +31,9 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
     useEffect(() => {
         if (sUser) {
             setSUserDetail(sUser);
+            if (!uid) {
+                uid = sUser.uid;
+            }
         } else if (uid) {
             request(baseUrl + '/yiguan/getSUserById', {
                 params: { 'uid': uid, },
@@ -91,11 +94,11 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
                 }}
                 onOpenChange={openChange}
                 onFinish={async (values) => {
-                    if (!sUser) {
+                    if (!uid) {
                         message.error('uid 不存在');
                         return;
                     }
-                    values.uid = sUser.uid;
+                    values.uid = uid;
                     values.photos = selectedPhotos?.join(",");
                     values.albumIds = sUserDetail?.albumIds;
                     let code = 0;
@@ -105,13 +108,13 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
                     } else {
                         url = baseUrl + '/yiguan/updateSUser';
                     }
-                    request(url, {
+                    await request(url, {
                         method: 'post',
                         data: values,
                         skipErrorHandler: true,
                     }).then(function (res) {
                         if (res.code == 1) {
-                            message.success(`添加成功!`);
+                            message.success(diaryId ? '添加成功!' : '更新成功!');
                         } else {
                             message.error(res.message);
                         }
