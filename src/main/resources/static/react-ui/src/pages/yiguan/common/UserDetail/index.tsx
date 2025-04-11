@@ -93,6 +93,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                 appendData();
             } else if (res.code == 8) {
                 if (res.msg == "真身不存在") {
+                    message.error("该用户还未开通真身~")
                     setLoad(false);
                 }
             } else if (res.code == 2) {
@@ -203,7 +204,6 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
             photos: "",
         };
         if (diary.album) {
-            sUser.albumIds = diary.album.id;
             if (diary.album.photo) {
                 sUser.photos = diary.album.photo;
             }

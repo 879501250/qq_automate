@@ -74,7 +74,6 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
             photos: "",
         };
         if (diary.album) {
-            sUser.albumIds = diary.album.id;
             if (diary.album.photo) {
                 sUser.photos = diary.album.photo;
             }

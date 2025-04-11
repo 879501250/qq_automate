@@ -100,7 +100,6 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
                     }
                     values.uid = uid;
                     values.photos = selectedPhotos?.join(",");
-                    values.albumIds = sUserDetail?.albumIds;
                     let code = 0;
                     let url;
                     if (diaryId) {
@@ -131,11 +130,6 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
                         <Tag bordered={false} color="green" key={index}>
                             <UserDetail userId={uid} title={uid} />
                         </Tag>
-                    ))}
-                </ProForm.Item>
-                <ProForm.Item label="专辑" name="albumIdList">
-                    {sUserDetail?.albumIds?.split(',').map((albumId, index) => (
-                        <AlbumDetail album={{ id: albumId, }} title={albumId} uid={sUserDetail?.uid} />
                     ))}
                 </ProForm.Item>
                 <ProFormDateTimePicker name="lastActiveTime" label="最新活跃时间" />

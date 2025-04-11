@@ -117,7 +117,6 @@ const MoodList: FC = () => {
             photos: "",
         };
         if (diary.album) {
-            sUser.albumIds = diary.album.id;
             if (diary.album.photo) {
                 sUser.photos = diary.album.photo;
             }

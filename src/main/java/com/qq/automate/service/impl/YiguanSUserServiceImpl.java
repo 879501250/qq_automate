@@ -139,34 +139,4 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
         return result;
     }
 
-    @Override
-    public Result updateSUserAlbumIds(String uid, String albumId) {
-        if (albumId == null || "".equals(albumId)) {
-            return Result.error().message("非法的参数：albumId [" + albumId + "]");
-        }
-        Result result = getSUserById(uid);
-        if (result.getSuccess()) {
-            YiguanSUser sUser = (YiguanSUser) result.getData();
-            String albumIds = sUser.getAlbumIds();
-            boolean b = false;
-            if (albumIds == null || "".equals(albumIds)) {
-                albumIds = albumId;
-                b = true;
-            } else {
-                if (!albumIds.contains(albumId)) {
-                    albumIds += "," + albumId;
-                    b = true;
-                }
-            }
-            if (b) {
-                yiguanSUserMapper.updateAlbumIds(sUser.getUid(), albumIds);
-                sUser.setAlbumIds(albumIds);
-                result.message("更新成功~");
-            } else {
-                result.message("专辑已添加~");
-            }
-        }
-        return result;
-    }
-
 }

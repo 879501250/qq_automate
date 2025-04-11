@@ -20,6 +20,4 @@ public interface YiguanSUserService extends IService<YiguanSUser> {
     Result getSUserById(String uid);
 
     Result updateSUserLastActiveTime(String uid, LocalDateTime lastActiveTime);
-
-    Result updateSUserAlbumIds(String uid, String albumId);
 }

@@ -135,10 +135,6 @@ public class YiguanServiceImpl implements YiguanService {
                     diaryVO.setIsSUser(true);
                     yiguanSUserService.updateSUserLastActiveTime(user.getId(),
                             LocalDateTime.parse(diaryVO.getScore(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                    // 收集 suser 的专辑
-                    if (diaryVO.getAlbum() != null) {
-                        yiguanSUserService.updateSUserAlbumIds(user.getId(), diaryVO.getAlbum().getId());
-                    }
                 } else {
                     // 不满足真身的查询条件就不显示
                     if (!queryListParams.vaildateRealMoods(diaryVO)) {

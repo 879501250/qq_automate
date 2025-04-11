@@ -45,7 +45,6 @@ export type Mood = {
 
 type SUser = {
   uid: string;
-  albumIds?: string;
   diaryText?: string;
   photos?: string;
   lastActiveTime?: string;

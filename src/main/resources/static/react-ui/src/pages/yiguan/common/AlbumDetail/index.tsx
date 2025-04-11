@@ -130,7 +130,6 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
             photos: "",
         };
         if (diary.album) {
-            sUser.albumIds = diary.album.id;
             if (diary.album.photo) {
                 sUser.photos = diary.album.photo;
             }

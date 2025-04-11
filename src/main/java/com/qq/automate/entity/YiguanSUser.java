@@ -36,11 +36,6 @@ public class YiguanSUser implements Serializable {
     @TableField("diaryId")
     private String diaryId;
     /**
-     * 专辑 id
-     */
-    @TableField("albumIds")
-    private String albumIds;
-    /**
      * 照片
      */
     @TableField("photos")
