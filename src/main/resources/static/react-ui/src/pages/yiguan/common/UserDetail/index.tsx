@@ -10,6 +10,7 @@ import AlbumDetail from '../AlbumDetail';
 import DiaryDetail from '../DiaryDetail';
 import SUserInfo from '../SUserInfo';
 import CommentList from '../CommentList';
+import AlbumList from '../AlbumList';
 import { followedDirays, formatTimestamp } from '../service';
 
 type UserInfo = {
@@ -32,7 +33,6 @@ type UserInfo = {
     desc: string[];
     isBanned: boolean;
     interactUseReal: boolean;
-    uid: number;
     ipLocation: string;
 };
 
@@ -93,7 +93,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                 appendData();
             } else if (res.code == 8) {
                 if (res.msg == "真身不存在") {
-                    message.info("该用户还未开通真身~")
+                    setLoad(false);
                 }
             } else if (res.code == 2) {
                 initialState?.refreshYiguanYgt?.().then(function (ygt) {
@@ -252,7 +252,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
                         </Col>
                         <Col flex={10}>
                             <div>
-                                <p>用户 id：{userInfo?.id}</p>
+                                <p>用户 id：<AlbumList uid={userId} /></p>
                                 <p>生日：{userInfo?.birthday}</p>
                                 <p>关注真身：{userInfo?.followNum}</p>
                                 <p>ip：{userInfo?.ipLocation}</p>

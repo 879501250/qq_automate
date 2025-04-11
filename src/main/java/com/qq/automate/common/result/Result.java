@@ -21,10 +21,6 @@ public class Result {
     // 返回数据
     private Object data = null;
 
-    // 私有化构造器
-    private Result() {
-    }
-
     // 成功的静态方法
     public static Result success() {
         Result result = new Result();

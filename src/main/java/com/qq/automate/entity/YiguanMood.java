@@ -1,12 +1,12 @@
 package com.qq.automate.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -24,7 +24,8 @@ import java.time.LocalDateTime;
 @TableName("yiguan_mood")
 public class YiguanMood implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 9083219220652948894L;
 
     /**
      * 情绪之海名称

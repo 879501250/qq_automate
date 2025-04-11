@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.sql.Timestamp;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -18,9 +19,10 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @TableName("yiguan_suser")
-public class YiguanSUser {
+public class YiguanSUser implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = -6416161916523301701L;
 
     /**
      * 用户 id

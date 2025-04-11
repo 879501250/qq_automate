@@ -3,6 +3,7 @@ package com.qq.automate.controller;
 import com.qq.automate.common.model.vo.YiguanQueryListParamsVO;
 import com.qq.automate.common.result.Result;
 import com.qq.automate.entity.YiguanSUser;
+import com.qq.automate.service.YiguanAlbumService;
 import com.qq.automate.service.YiguanMoodService;
 import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
@@ -26,6 +27,8 @@ public class YiguanController {
     private YiguanService yiguanService;
     @Autowired
     private YiguanSUserService yiguanSUserService;
+    @Autowired
+    private YiguanAlbumService yiguanAlbumService;
 
     @GetMapping("/listAllMood")
     public Result listAllMood() {
@@ -46,6 +49,7 @@ public class YiguanController {
     public Result setQueryListParams(YiguanQueryListParamsVO yiguanQueryListParamsVO) {
         return yiguanService.setQueryListParams(yiguanQueryListParamsVO);
     }
+
     @GetMapping("/isSUser")
     public Result isSUser(String uid) {
         return yiguanSUserService.isSUser(uid);
@@ -77,8 +81,8 @@ public class YiguanController {
     }
 
     @GetMapping("/startBackgroundQueryScheduler")
-    public Result startBackgroundQueryScheduler(Long lastScore,Long interval) {
-        return yiguanService.startBackgroundQueryScheduler(lastScore,interval);
+    public Result startBackgroundQueryScheduler(Long lastScore, Long interval) {
+        return yiguanService.startBackgroundQueryScheduler(lastScore, interval);
     }
 
     @GetMapping("/stopBackgroundQueryScheduler")
@@ -100,4 +104,10 @@ public class YiguanController {
     public Result clearBackgroundYiguanDiary() {
         return yiguanService.clearBackgroundYiguanDiary();
     }
+
+    @GetMapping("/listAlbumsByUserId")
+    public Result listAlbumsByUserId(String uid) {
+        return yiguanAlbumService.listAlbumsByUserId(uid);
+    }
+
 }

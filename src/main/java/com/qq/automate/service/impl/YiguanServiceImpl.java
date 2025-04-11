@@ -1,5 +1,6 @@
 package com.qq.automate.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -9,27 +10,29 @@ import com.qq.automate.common.model.vo.YiguanDiaryVO;
 import com.qq.automate.common.model.vo.YiguanQueryListParamsVO;
 import com.qq.automate.common.model.vo.YiguanUserVO;
 import com.qq.automate.common.result.Result;
+import com.qq.automate.entity.YiguanAlbum;
+import com.qq.automate.service.YiguanAlbumService;
 import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ScheduledFuture;
 
 @Service
 public class YiguanServiceImpl implements YiguanService {
 
     @Autowired
     private YiguanSUserService yiguanSUserService;
+
+    @Autowired
+    private YiguanAlbumService yiguanAlbumService;
 
     @Autowired
     private ScheduledTaskRegistrar scheduledTaskRegistrar;
@@ -40,11 +43,11 @@ public class YiguanServiceImpl implements YiguanService {
             lastScore = 0L;
         }
         List<YiguanDiaryVO> list = new LinkedList<>();
-        Long temp = addDiarys(list, lastScore, false);
+        Long temp = listDiarys(list, lastScore, false);
         return Result.success().data("diaries", list).data("lastScore", temp);
     }
 
-    private Long addDiarys(List<YiguanDiaryVO> list, Long lastScore, boolean isBackgroundQuery) {
+    private Long listDiarys(List<YiguanDiaryVO> list, Long lastScore, boolean isBackgroundQuery) {
         String result = HttpRequest.get(YiguanConstant.YIGUAN_LIST_NEW_URL).execute().body();
         JSONObject jsonObject = JSONUtil.parseObj(result);
         JSONArray datas = jsonObject.getJSONArray("data");
@@ -58,6 +61,7 @@ public class YiguanServiceImpl implements YiguanService {
                 // 判断性别
                 Integer gender = data.getByPath("user.gender", Integer.class);
                 if (2 == gender) {
+                    collectAlbum(data.getJSONObject("album"));
                     diaryVO = filterDiary(data, isBackgroundQuery);
                     if (diaryVO != null) {
                         YiguanUserVO user = diaryVO.getUser();
@@ -81,6 +85,22 @@ public class YiguanServiceImpl implements YiguanService {
     }
 
     /**
+     * 收集专辑信息
+     *
+     * @param album
+     */
+    private void collectAlbum(JSONObject album) {
+        if (album != null) {
+            YiguanAlbum yiguanAlbum = new YiguanAlbum();
+            yiguanAlbum.setAlbumId(album.getStr("id"));
+            yiguanAlbum.setUid(album.getStr("uid"));
+            yiguanAlbum.setCreateTime(DateUtil.format(DateUtil.date(album.getLong("createTime")),
+                    "yyyy-MM-dd HH:mm:ss"));
+            yiguanAlbumService.insertOrUpdateAlbum(yiguanAlbum);
+        }
+    }
+
+    /**
      * 对罐头按查询条件进行筛选
      *
      * @param data
@@ -90,9 +110,10 @@ public class YiguanServiceImpl implements YiguanService {
     private YiguanDiaryVO filterDiary(JSONObject data, boolean isBackgroundQuery) {
         YiguanDiaryVO diaryVO = JSONUtil.toBean(data, YiguanDiaryVO.class);
         Boolean isReal = data.getByPath("user.isReal", Boolean.class);
+        JSONObject album = data.getJSONObject("album");
         if (!isBackgroundQuery && queryListParams == null) {
             // 内容太多了，现在只看真身或者带专辑的罐头
-            if (Boolean.FALSE.equals(isReal) && data.getJSONObject("album") == null) {
+            if (Boolean.FALSE.equals(isReal) && album == null) {
                 // 不是真身，也不包含专辑就不看
                 diaryVO = null;
             } else {
@@ -102,12 +123,12 @@ public class YiguanServiceImpl implements YiguanService {
             String mood = data.getByPath("mood.name", String.class);
             diaryVO.setMood(mood);
             // 是否可以获取到真身，即真身用户或带专辑的匿名用户
-            if (isReal || data.getJSONObject("album") != null) {
+            if (isReal || album != null) {
                 YiguanUserVO user = diaryVO.getUser();
                 if (isReal) {
                     user.setAge(data.getStr("age"));
                 } else {
-                    user.setId(data.getByPath("album.uid", String.class));
+                    user.setId(album.getStr("uid"));
                 }
                 // 是否是 suser
                 if (Boolean.TRUE.equals(yiguanSUserService.isSUser(user.getId()).getData())) {
@@ -180,7 +201,7 @@ public class YiguanServiceImpl implements YiguanService {
         backgroundQueryData.setLastScore(lastScore);
         backgroundQueryTask = scheduledTaskRegistrar.scheduleFixedRateTask(
                 new FixedRateTask(() -> {
-                    backgroundQueryData.setLastScore(addDiarys(
+                    backgroundQueryData.setLastScore(listDiarys(
                             backgroundQueryData.getYiguanDiaryList(),
                             backgroundQueryData.getLastScore(),
                             true));
