@@ -31,9 +31,6 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
     useEffect(() => {
         if (sUser) {
             setSUserDetail(sUser);
-            if (!uid) {
-                uid = sUser.uid;
-            }
         } else if (uid) {
             request(baseUrl + '/yiguan/getSUserById', {
                 params: { 'uid': uid, },
@@ -95,8 +92,12 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
                 onOpenChange={openChange}
                 onFinish={async (values) => {
                     if (!uid) {
-                        message.error('uid 不存在');
-                        return;
+                        if (sUser?.uid) {
+                            uid = sUser.uid;
+                        } else {
+                            message.error('uid 不存在');
+                            return;
+                        }
                     }
                     values.uid = uid;
                     values.photos = selectedPhotos?.join(",");
