@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Card, Tooltip, Tag, message } from 'antd';
 import { request } from '@umijs/max';
 import AlbumDetail from '../AlbumDetail';
+import { Album } from '../data';
 
-type Album = {
-    albumId: string;
-    uid: string;
-    updateTime: string;
-    createTime: string;
-}
+// type Album = {
+//     albumId: string;
+//     uid: string;
+//     updateTime: string;
+//     createTime: string;
+// }
 
-const baseUrl = 'http://localhost:8001';
-// const baseUrl = '';
+// const baseUrl = 'http://localhost:8001';
+const baseUrl = '';
 
 const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
 
@@ -60,7 +61,7 @@ const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
                     bordered={false}
                 >
                     {albums.map((album, index) => (
-                        <AlbumDetail album={{ id: album.albumId, }} title={album.albumId} uid={uid} />
+                        <AlbumDetail album={{ id: album.id, }} title={album.title || album.id} uid={uid} />
                     ))}
                 </Card>
             </Modal>

@@ -1,6 +1,5 @@
 package com.qq.automate.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -14,6 +13,7 @@ import com.qq.automate.entity.YiguanAlbum;
 import com.qq.automate.service.YiguanAlbumService;
 import com.qq.automate.service.YiguanSUserService;
 import com.qq.automate.service.YiguanService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
@@ -21,10 +21,13 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @Service
 public class YiguanServiceImpl implements YiguanService {
 
@@ -61,7 +64,7 @@ public class YiguanServiceImpl implements YiguanService {
                 // 判断性别
                 Integer gender = data.getByPath("user.gender", Integer.class);
                 if (2 == gender) {
-                    collectAlbum(data.getJSONObject("album"));
+                    collectAlbum(data.getJSONObject("album"), score);
                     diaryVO = filterDiary(data, isBackgroundQuery);
                     if (diaryVO != null) {
                         YiguanUserVO user = diaryVO.getUser();
@@ -89,13 +92,14 @@ public class YiguanServiceImpl implements YiguanService {
      *
      * @param album
      */
-    private void collectAlbum(JSONObject album) {
+    private void collectAlbum(JSONObject album, Long score) {
         if (album != null) {
             YiguanAlbum yiguanAlbum = new YiguanAlbum();
             yiguanAlbum.setAlbumId(album.getStr("id"));
             yiguanAlbum.setUid(album.getStr("uid"));
-            yiguanAlbum.setCreateTime(DateUtil.format(DateUtil.date(album.getLong("createTime")),
-                    "yyyy-MM-dd HH:mm:ss"));
+            yiguanAlbum.setAlbumTitle(album.getStr("title"));
+            yiguanAlbum.setUpdateTime(Instant.ofEpochMilli(score * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime());
+            yiguanAlbum.setCreateTime(Instant.ofEpochMilli(album.getLong("createTime")).atZone(ZoneId.systemDefault()).toLocalDateTime());
             yiguanAlbumService.insertOrUpdateAlbum(yiguanAlbum);
         }
     }

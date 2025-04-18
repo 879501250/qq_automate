@@ -44,6 +44,12 @@ public class YiguanAlbum implements Serializable {
     /**
      * 更新时间
      */
+    @TableField("album_title")
+    private String albumTitle;
+
+    /**
+     * 更新时间
+     */
     @TableField("update_time")
     private LocalDateTime updateTime;
 
@@ -51,5 +57,5 @@ public class YiguanAlbum implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private String createTime;
+    private LocalDateTime createTime;
 }
