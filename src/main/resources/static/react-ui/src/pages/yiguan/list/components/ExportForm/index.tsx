@@ -7,9 +7,6 @@ import {
     ProFormDigit,
 } from '@ant-design/pro-components';
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 interface ExportFormProps {
     diaryList: Diary[];
     removeDiaryList: (count: number) => void; // 注意这里的返回类型是void，表示这个函数不返回任何值  

@@ -43,9 +43,6 @@ type photo = {
     hash: any;
 }
 
-// const baseUrl = 'http://localhost:8001';
-const baseUrl = '';
-
 
 const detailUrl = 'https://api.jijigugu.club/realProfile/get';
 const listUrl = 'https://api.jijigugu.club/diary/listByRealProfile';
@@ -112,7 +109,7 @@ const UserDetail: React.FC<{ userId: string, title: string }> = ({ userId, title
     }
 
     function isSUser(uid: string) {
-        request(baseUrl + "/yiguan/isSUser", {
+        request("/yiguan/isSUser", {
             params: { 'uid': uid },
             skipErrorHandler: true,
         }).then(function (res) {

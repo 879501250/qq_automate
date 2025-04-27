@@ -8,9 +8,6 @@ import DiaryList from '../../../common/DiaryList';
 import type { Diary } from '../../../common/data';
 import { request } from '@umijs/max';
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 const BackgroundDiaryList: React.FC = () => {
 
     const [modal, setModal] = useState(false);
@@ -18,7 +15,7 @@ const BackgroundDiaryList: React.FC = () => {
     const [list, setList] = useState<Diary[]>([]);
 
     function getBackgroundYiguanDiaryList() {
-        request(url + '/yiguan/getBackgroundYiguanDiaryList').then(function (res) {
+        request('/yiguan/getBackgroundYiguanDiaryList').then(function (res) {
             if (res.code == 1) {
                 setList(res.data.diaries);
                 setModal(true);
@@ -29,7 +26,7 @@ const BackgroundDiaryList: React.FC = () => {
     }
 
     function removeBackgroundYiguanDiary(id: string) {
-        request(url + '/yiguan/removeBackgroundYiguanDiary', {
+        request('/yiguan/removeBackgroundYiguanDiary', {
             params: {
                 'id': id,
             },
@@ -40,7 +37,7 @@ const BackgroundDiaryList: React.FC = () => {
     }
 
     function clearBackgroundYiguanDiaryList() {
-        request(url + '/yiguan/clearBackgroundYiguanDiary').then(function (res) {
+        request('/yiguan/clearBackgroundYiguanDiary').then(function (res) {
 
         });
     }

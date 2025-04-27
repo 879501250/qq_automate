@@ -25,9 +25,6 @@ const FormItem = Form.Item;
 
 const pageSize = 5;
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 const contentStyle: React.CSSProperties = {
   margin: 0,
   height: '160px',
@@ -50,7 +47,7 @@ const List: FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const appendData = () => {
-    request(url + '/yiguan/listNew', {
+    request('/yiguan/listNew', {
       params: { 'lastScore': lastScore.current, },
       skipErrorHandler: true,
     }).then(function (res) {
@@ -97,7 +94,7 @@ const List: FC = () => {
   }, []);
 
   function startBackgroundQueryScheduler() {
-    request(url + '/yiguan/startBackgroundQueryScheduler', {
+    request('/yiguan/startBackgroundQueryScheduler', {
       params: {
         'lastScore': lastScore.current,
         'interval': time,
@@ -111,7 +108,7 @@ const List: FC = () => {
   }
 
   function stopBackgroundQueryScheduler() {
-    request(url + '/yiguan/stopBackgroundQueryScheduler').then(function (res) {
+    request('/yiguan/stopBackgroundQueryScheduler').then(function (res) {
       if (res.code == 0) {
         message.error(res.message);
       } else if (res.code == 1) {

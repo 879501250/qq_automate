@@ -17,9 +17,6 @@ import CommentList from '../CommentList';
 import { followedDirays } from '../service';
 import UserDetail from '../UserDetail';
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 const { TextArea } = Input;
 
 

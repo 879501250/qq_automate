@@ -11,9 +11,6 @@ import type { SUser, TableListPagination, Result } from '../common/data';
 import UserDetail from '../common/UserDetail';
 import SUserInfo from '../common/SUserInfo';
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 /**
  * 删除节点
  *
@@ -130,7 +127,7 @@ const SUserList: React.FC = () => {
                     console.log(filter);
                     // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
                     // 如果需要转化参数可以在这里进行修改
-                    const msg = await request<Result>(url + '/yiguan/listSUsers', {
+                    const msg = await request<Result>('/yiguan/listSUsers', {
                         // params: { 'uid': sUser.uid, },
                         skipErrorHandler: true,
                     });

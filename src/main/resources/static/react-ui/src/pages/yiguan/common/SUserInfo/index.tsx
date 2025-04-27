@@ -12,9 +12,6 @@ import {
     ProFormTextArea,
 } from '@ant-design/pro-components';
 
-// const baseUrl = 'http://localhost:8001';
-const baseUrl = '';
-
 const diaryDetailUrl = 'https://api.jijigugu.club/diary/detail';
 
 interface SUserProps {
@@ -32,7 +29,7 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
         if (sUser) {
             setSUserDetail(sUser);
         } else if (uid) {
-            request(baseUrl + '/yiguan/getSUserById', {
+            request('/yiguan/getSUserById', {
                 params: { 'uid': uid, },
                 skipErrorHandler: true,
             }).then(function (res) {
@@ -104,9 +101,9 @@ const SUserInfo: React.FC<SUserProps> = ({ sUser, trigger, diaryId, uid }) => {
                     let code = 0;
                     let url;
                     if (diaryId) {
-                        url = baseUrl + '/yiguan/addSUser';
+                        url = '/yiguan/addSUser';
                     } else {
-                        url = baseUrl + '/yiguan/updateSUser';
+                        url = '/yiguan/updateSUser';
                     }
                     await request(url, {
                         method: 'post',

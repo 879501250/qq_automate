@@ -11,9 +11,6 @@ import { Album } from '../data';
 //     createTime: string;
 // }
 
-// const baseUrl = 'http://localhost:8001';
-const baseUrl = '';
-
 const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
 
     const [open, setOpen] = useState(false);
@@ -29,7 +26,7 @@ const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
 
     useEffect(() => {
         if (open) {
-            request(baseUrl + "/yiguan/listAlbumsByUserId", {
+            request("/yiguan/listAlbumsByUserId", {
                 params: { 'uid': uid },
                 skipErrorHandler: true,
             }).then(function (res) {

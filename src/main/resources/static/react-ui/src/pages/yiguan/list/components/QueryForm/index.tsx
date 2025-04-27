@@ -28,9 +28,6 @@ interface QueryFormProps {
 
 const FormItem = Form.Item;
 
-// const url = 'http://localhost:8001';
-const url = '';
-
 const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryList, other }) => {
 
     const { initialState } = useModel('@@initialState');
@@ -61,7 +58,7 @@ const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryLi
 
     const [queryParams, setQueryParams] = useState<QueryParams>(initialQueryParams);
     useEffect(() => {
-        request(url + '/yiguan/setQueryListParams', {
+        request('/yiguan/setQueryListParams', {
             method: 'post',
             params: queryParams,
             skipErrorHandler: true,

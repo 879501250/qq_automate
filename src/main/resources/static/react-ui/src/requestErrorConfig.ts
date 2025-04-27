@@ -89,7 +89,13 @@ export const errorConfig: RequestConfig = {
   requestInterceptors: [
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token = 123');
+      // const url = config?.url?.concat('?token = 123');
+
+      // 设置请求 baseUrl
+      const baseUrl = '';
+      // const baseUrl = 'http://localhost:8001';
+      const url = baseUrl.concat(config?.url || '');
+
       return { ...config, url };
     },
   ],
