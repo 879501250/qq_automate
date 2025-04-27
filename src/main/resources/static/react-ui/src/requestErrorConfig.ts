@@ -92,9 +92,12 @@ export const errorConfig: RequestConfig = {
       // const url = config?.url?.concat('?token = 123');
 
       // 设置请求 baseUrl
-      const baseUrl = '';
-      // const baseUrl = 'http://localhost:8001';
-      const url = baseUrl.concat(config?.url || '');
+      var baseUrl = '';
+      // baseUrl = 'http://localhost:8001';
+      var url = config.url || '/';
+      if (url.startsWith("/")) {
+        url = baseUrl.concat(url);
+      }
 
       return { ...config, url };
     },
