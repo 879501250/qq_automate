@@ -3,9 +3,7 @@ package com.qq.automate.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,8 +17,9 @@ import java.time.LocalDateTime;
  * @author Q
  * @since 2024-07-19 13:58:07
  */
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @TableName("yiguan_album")
 public class YiguanAlbum implements Serializable {

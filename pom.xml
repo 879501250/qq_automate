@@ -16,6 +16,7 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
@@ -68,7 +69,7 @@
             <version>1.2.23</version>
         </dependency>
 
-        <!-- Lombok依赖：pojo类通用方法生成、日志框架等 -->
+        <!-- Lombok依赖：pojo类通用方法生成、日志框架等（减少 Getter/Setter 代码） -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -86,6 +87,31 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+
+        <!-- 引入时，mapstruct-processor 必须在 lombok 后面 -->
+        <!-- mapstruct 数据类（bean）转换工具 -->
+        <!-- https://cloud.tencent.com/developer/article/2377288 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <!-- MapStruct 处理器 (需要让 MapStruct 自动生成转换代码) -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope> <!-- 只在编译时使用，不打包 -->
+        </dependency>
+        <!-- 从 Lombok 1.18.16 开始需要额外的注解处理器，这个版本之前的不用加 -->
+        <!-- Lombok MapStruct 兼容插件 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>0.2.0</version>
+            <scope>provided</scope>
         </dependency>
 
 
