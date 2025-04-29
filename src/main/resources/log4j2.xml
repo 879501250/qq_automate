@@ -43,7 +43,7 @@
             <Policies>
                 <!-- <TimeBasedTriggeringPolicy /> -->
                 <!-- 文件达到指定大小后触发轮换 -->
-                <SizeBasedTriggeringPolicy size="20 MB" />
+                <SizeBasedTriggeringPolicy size="10 MB" />
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
