@@ -103,6 +103,8 @@ public class YiguanServiceImpl implements YiguanService {
             yiguanAlbum.setAlbumId(album.getStr("id"));
             yiguanAlbum.setUid(album.getStr("uid"));
             yiguanAlbum.setAlbumTitle(album.getStr("title"));
+            yiguanAlbum.setDiaryNum(album.getInt("diaryNum"));
+            yiguanAlbum.setFollowNum(album.getInt("followNum"));
             yiguanAlbum.setUpdateTime(Instant.ofEpochMilli(score * 1000).atZone(ZoneId.systemDefault()).toLocalDateTime());
             yiguanAlbum.setCreateTime(Instant.ofEpochMilli(album.getLong("createTime")).atZone(ZoneId.systemDefault()).toLocalDateTime());
             yiguanAlbumService.insertOrUpdateAlbum(yiguanAlbum);

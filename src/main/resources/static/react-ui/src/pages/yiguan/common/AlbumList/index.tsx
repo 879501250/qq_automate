@@ -34,6 +34,14 @@ const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
             },
         },
         {
+            title: '关注人数',
+            dataIndex: 'followNum',
+        },
+        {
+            title: '罐头数量',
+            dataIndex: 'diaryNum',
+        },
+        {
             title: '更新时间',
             dataIndex: 'updateTime',
             defaultSortOrder: 'descend',

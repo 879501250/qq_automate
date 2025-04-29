@@ -41,10 +41,22 @@ public class YiguanAlbum implements Serializable {
     private String uid;
 
     /**
-     * 更新时间
+     * 专辑标题
      */
     @TableField("album_title")
     private String albumTitle;
+
+    /**
+     * 关注人数
+     */
+    @TableField("follow_num")
+    private Integer followNum;
+
+    /**
+     * 罐头数量
+     */
+    @TableField("diary_num")
+    private Integer diaryNum;
 
     /**
      * 更新时间
