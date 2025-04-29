@@ -1,7 +1,11 @@
 package com.qq.automate.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qq.automate.common.model.PageResult;
+import com.qq.automate.common.model.query.YiguanAlbumQuery;
+import com.qq.automate.common.model.vo.YiguanAlbumVO;
 import com.qq.automate.common.result.Result;
 import com.qq.automate.util.convert.YiguanAlbumConvert;
 import com.qq.automate.entity.YiguanAlbum;
@@ -21,11 +25,12 @@ public class YiguanAlbumServiceImpl extends ServiceImpl<YiguanAlbumMapper, Yigua
     private YiguanAlbumConvert yiguanAlbumConvert;
 
     @Override
-    public Result listAlbumsByUserId(String uid) {
+    public PageResult<YiguanAlbumVO> listAlbumsByUserIdPage(YiguanAlbumQuery query) {
         QueryWrapper<YiguanAlbum> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("uid", uid);
-        List<YiguanAlbum> yiguanAlbums = yiguanAlbumMapper.selectList(queryWrapper);
-        return Result.success().data(yiguanAlbumConvert.albumsToAlbumVOs(yiguanAlbums));
+        queryWrapper.eq("uid", query.getUid());
+        Page<YiguanAlbum> page = query.toMpPage();
+        this.page(page, queryWrapper);
+        return PageResult.ofList(page, (List<YiguanAlbum> list) -> yiguanAlbumConvert.albumsToAlbumVOs(list));
     }
 
     @Override

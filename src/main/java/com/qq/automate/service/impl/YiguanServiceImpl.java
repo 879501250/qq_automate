@@ -1,5 +1,6 @@
 package com.qq.automate.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -67,6 +68,10 @@ public class YiguanServiceImpl implements YiguanService {
                     collectAlbum(data.getJSONObject("album"), score);
                     diaryVO = filterDiary(data, isBackgroundQuery);
                     if (diaryVO != null) {
+                        // 时间转化
+                        if (diaryVO.getAlbum() != null) {
+                            diaryVO.getAlbum().setCreateTime(DateTime.of(Long.parseLong(diaryVO.getAlbum().getCreateTime())).toString());
+                        }
                         YiguanUserVO user = diaryVO.getUser();
                         if (user.getAvatar() != null) {
                             user.setAvatar(YiguanConstant.YIGUAN_PHOTO_URL + data.getByPath("user.avatar.key", String.class));

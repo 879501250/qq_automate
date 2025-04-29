@@ -1,6 +1,7 @@
 package com.qq.automate.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.qq.automate.interceptor.MybatisSqlInterceptor;
 import jakarta.annotation.PostConstruct;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -25,8 +26,9 @@ public class MyBatisPlusConfig {
             org.apache.ibatis.session.Configuration configuration = sqlSessionFactory.getConfiguration();
             // 将数据权限拦截器添加到MybatisPlusInterceptor拦截器链
             MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
-            mybatisPlusInterceptor.addInnerInterceptor(new MybatisSqlInterceptor());
             // 先添加PageHelper分页插件拦截器，再添加MybatisPlusInterceptor拦截器
+            mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+            mybatisPlusInterceptor.addInnerInterceptor(new MybatisSqlInterceptor());
             // configuration.addInterceptor(new PageInterceptor());
             configuration.addInterceptor(mybatisPlusInterceptor);
         }

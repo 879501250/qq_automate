@@ -1,6 +1,9 @@
 package com.qq.automate.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.qq.automate.common.model.PageResult;
+import com.qq.automate.common.model.query.YiguanSUserQuery;
+import com.qq.automate.common.model.vo.YiguanSUserVO;
 import com.qq.automate.common.result.Result;
 import com.qq.automate.entity.YiguanSUser;
 
@@ -9,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface YiguanSUserService extends IService<YiguanSUser> {
-    Result listSUsers();
 
     Result addSUser(YiguanSUser yiguanSUser);
 
@@ -20,4 +22,6 @@ public interface YiguanSUserService extends IService<YiguanSUser> {
     Result getSUserById(String uid);
 
     Result updateSUserLastActiveTime(String uid, LocalDateTime lastActiveTime);
+
+    PageResult<YiguanSUserVO> listSUsersPage(YiguanSUserQuery query);
 }

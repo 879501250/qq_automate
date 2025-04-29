@@ -1,6 +1,12 @@
 package com.qq.automate.controller;
 
+import com.qq.automate.common.model.PageQuery;
+import com.qq.automate.common.model.PageResult;
+import com.qq.automate.common.model.query.YiguanAlbumQuery;
+import com.qq.automate.common.model.query.YiguanSUserQuery;
+import com.qq.automate.common.model.vo.YiguanAlbumVO;
 import com.qq.automate.common.model.vo.YiguanQueryListParamsVO;
+import com.qq.automate.common.model.vo.YiguanSUserVO;
 import com.qq.automate.common.result.Result;
 import com.qq.automate.entity.YiguanSUser;
 import com.qq.automate.service.YiguanAlbumService;
@@ -55,9 +61,9 @@ public class YiguanController {
         return yiguanSUserService.isSUser(uid);
     }
 
-    @GetMapping("/listSUsers")
-    public Result listSUsers() {
-        return yiguanSUserService.listSUsers();
+    @GetMapping("/listSUsersPage")
+    public PageResult<YiguanSUserVO> listSUsersPage(YiguanSUserQuery query) {
+        return yiguanSUserService.listSUsersPage(query);
     }
 
     @PostMapping("/addSUser")
@@ -105,9 +111,9 @@ public class YiguanController {
         return yiguanService.clearBackgroundYiguanDiary();
     }
 
-    @GetMapping("/listAlbumsByUserId")
-    public Result listAlbumsByUserId(String uid) {
-        return yiguanAlbumService.listAlbumsByUserId(uid);
+    @GetMapping("/listAlbumsByUserIdPage")
+    public PageResult<YiguanAlbumVO> listAlbumsByUserIdPage(YiguanAlbumQuery query) {
+        return yiguanAlbumService.listAlbumsByUserIdPage(query);
     }
 
 }

@@ -1,7 +1,13 @@
 package com.qq.automate.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qq.automate.common.model.PageResult;
+import com.qq.automate.common.model.query.YiguanSUserQuery;
+import com.qq.automate.common.model.vo.YiguanSUserVO;
 import com.qq.automate.common.result.Result;
+import com.qq.automate.entity.YiguanAlbum;
 import com.qq.automate.entity.YiguanSUser;
 import com.qq.automate.mapper.YiguanSUserMapper;
 import com.qq.automate.service.YiguanSUserService;
@@ -20,11 +26,6 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
     private YiguanSUserMapper yiguanSUserMapper;
 
     private static Map<String, YiguanSUser> suserCache = new HashMap<>();
-
-    @Override
-    public Result listSUsers() {
-        return Result.success().data("susers", yiguanSUserMapper.listAll());
-    }
 
     private void initSUserCache() {
         for (YiguanSUser yiguanSUser : yiguanSUserMapper.listAll()) {
@@ -137,6 +138,13 @@ public class YiguanSUserServiceImpl extends ServiceImpl<YiguanSUserMapper, Yigua
             result.message("更新成功~");
         }
         return result;
+    }
+
+    @Override
+    public PageResult<YiguanSUserVO> listSUsersPage(YiguanSUserQuery query) {
+        Page<YiguanSUser> page = query.toMpPage();
+        this.page(page);
+        return PageResult.of(page, YiguanSUserVO.class);
     }
 
 }

@@ -31,8 +31,8 @@ public class YiguanAlbumVO {
     private Integer followNum;
 
     // 专辑更新时间
-    private LocalDateTime updateTime;
+    private String updateTime;
 
     // 专辑创建时间
-    private LocalDateTime createTime;
+    private String createTime;
 }

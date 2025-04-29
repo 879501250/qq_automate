@@ -32,7 +32,8 @@ export type Album = {
   photo?: string;
   diaryNum?: number;
   followNum?: number;
-  createTime?: number;
+  createTime?: string;
+  updateTime?: string;
 };
 
 
@@ -61,6 +62,12 @@ type Result = {
   code: number;
   message: string;
   data: any;
+};
+
+type PageResult = {
+  total: number;
+  pages: number;
+  list: any;
 };
 
 

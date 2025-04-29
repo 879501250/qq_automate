@@ -68,6 +68,7 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
                     skipErrorHandler: true,
                 }).then(function (res) {
                     if (res.code == 0) {
+                        res.data.createTime = formatTimestamp(res.data.createTime);
                         setAlbumDetail(res.data);
                         album.photo = res.data.photo;
                         setLoad(false);
@@ -190,7 +191,7 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
                         <Col flex={5}>
                             <div>
                                 <p>罐头数量：{albumDetail.diaryNum}</p>
-                                <p>创建时间：{formatTimestamp(albumDetail.createTime || 0)}</p>
+                                <p>创建时间：{albumDetail.createTime}</p>
                             </div>
                         </Col>
                     </Row>
