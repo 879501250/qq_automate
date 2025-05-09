@@ -25,9 +25,10 @@ const ContainerHeight = 700;
 interface ListProps {
     diaryList: Diary[];
     removeDiaryList?: (count: number) => void;
+    extActions?: (diary: Diary, index: number) => React.ReactNode[];
 }
 
-const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
+const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList, extActions }) => {
 
     const getActions = (diary: Diary, index: number): React.ReactNode[] => {
         const actions: React.ReactNode[] = [];
@@ -60,6 +61,9 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList }) => {
         }
         if (removeDiaryList) {
             actions.push(<Button danger onClick={() => removeDiaryList(index + 1)}>删除</Button>);
+        }
+        if (extActions) {
+            actions.push(...(extActions(diary,index)));
         }
         return actions;
     };

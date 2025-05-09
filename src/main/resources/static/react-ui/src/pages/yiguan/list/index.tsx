@@ -238,6 +238,17 @@ const List: FC = () => {
                   cleanDiary(sUseList.length - 1, count - 1);
                   setAlbumList(albumList.slice(count));
                 }}
+                extActions={(diary, index) => {
+                  const actions: React.ReactNode[] = [];
+                  actions.push(
+                    <Button danger onClick={
+                      () => {
+                        setAlbumList(albumList.filter(albumDiary => diary.album.id != albumDiary.album.id));
+                      }
+                    }>删除专辑</Button>
+                  );
+                  return actions;
+                }}
               />
             </Modal>
             <FollowDiaryList />
