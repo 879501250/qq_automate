@@ -33,4 +33,8 @@ public class YiguanDiaryVO {
     private Boolean isCommentOpen;
     // 是否是 suser
     private Boolean isSUser;
+    // 投票选项
+    private YiguanVoteOptionVO[] vote;
+    // 投票人数
+    private Integer voteUserNum;
 }

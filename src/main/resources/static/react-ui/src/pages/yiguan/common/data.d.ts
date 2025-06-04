@@ -14,7 +14,16 @@ export interface Diary {
   likedNum?: number;
   commentedNum?: number;
   isCommentOpen: boolean;
+  vote?: voteOption[];
+  voteUserNum?: number;
 }
+
+export type voteOption = {
+  malePercent: number;
+  femalePercent: number;
+  optionPercent: number;
+  option: string;
+};
 
 export type User = {
   id: string;
