@@ -37,7 +37,7 @@ const DiaryList: React.FC<ListProps> = ({ diaryList, removeDiaryList, extActions
         actions.push(
             <a
                 style={{ color: 'inherit' }}
-                onClick={() => { followedDirays.add(diary); console.log(followedDirays) }}
+                onClick={() => { followedDirays.add(diary); }}
             >
                 {React.createElement(StarOutlined)}
             </a>

@@ -20,7 +20,6 @@ export default function Page() {
     });
     if (!loading && initialQueryParams.mood == '') {
         const moods: Mood[] = initialState?.moods || [];
-        console.log(moods);
         setInitialQueryParams({
             ...initialQueryParams,
             mood: moods
