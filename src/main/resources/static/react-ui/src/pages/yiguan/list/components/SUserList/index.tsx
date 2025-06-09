@@ -4,7 +4,8 @@ import type { Diary } from '../../../common/data';
 import DiaryList from '../../../common/DiaryList';
 import GenericTable from '../../../common/GenericTable';
 import SUserInfo from '../../../common/SUserInfo';
-import { Button, Modal, } from 'antd';
+import UserDetail from '../../../common/UserDetail';
+import { Button, Modal, message } from 'antd';
 
 interface suser {
     uid: string,
@@ -41,6 +42,46 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
         {
             title: '罐头数量',
             dataIndex: 'count',
+            render: (dom, suser) => {
+                return (
+                    <>
+                        <a onClick={
+                            () => {
+                                const list = suserMap.get(suser.uid) || [];
+                                if (list.length > 0) {
+                                    setSuserDetailModal(true);
+                                    setDiaryList(list);
+                                } else {
+                                    message.error("暂无罐头可查看~");
+                                }
+                            }
+                        }>
+                            {suser.count}
+                        </a>
+                        <Modal
+                            title={diaryList.length}
+                            width={'80%'}
+                            open={suserDetailModal}
+                            onCancel={() => { setSuserDetailModal(false); setDiaryList([]); }}
+                            footer={[
+                                <Button
+                                    onClick={() => {
+                                        setSuserDetailModal(false);
+                                        setDiaryList([]);
+                                        deleteSUserList(diaryList[0].user.id);
+                                    }}
+                                >
+                                    清空
+                                </Button>,
+                            ]}
+                        >
+                            <DiaryList
+                                diaryList={diaryList}
+                            />
+                        </Modal>
+                    </>
+                );
+            },
             width: '40%',
         },
         {
@@ -48,37 +89,7 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
             dataIndex: 'option',
             valueType: 'option',
             render: (dom, suser) => [
-                <>
-                    <a onClick={
-                        () => {
-                            setSuserDetailModal(true);
-                            setDiaryList(suserMap.get(suser.uid) || []);
-                        }
-                    }>
-                        详情
-                    </a>
-                    <Modal
-                        title={diaryList.length}
-                        width={'80%'}
-                        open={suserDetailModal}
-                        onCancel={() => { setSuserDetailModal(false); setDiaryList([]); }}
-                        footer={[
-                            <Button
-                                onClick={() => {
-                                    setSuserDetailModal(false);
-                                    setDiaryList([]);
-                                    deleteSUserList(suser.uid);
-                                }}
-                            >
-                                清空
-                            </Button>,
-                        ]}
-                    >
-                        <DiaryList
-                            diaryList={diaryList}
-                        />
-                    </Modal>
-                </>,
+                <UserDetail userId={suser.uid} title="真身" />,
                 <a onClick={() => { deleteSUserList(suser.uid); }}>
                     删除
                 </a>,

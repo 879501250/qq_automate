@@ -4,7 +4,8 @@ import type { Diary } from '../../../common/data';
 import DiaryList from '../../../common/DiaryList';
 import GenericTable from '../../../common/GenericTable';
 import AlbumDetail from '../../../common/AlbumDetail';
-import { Button, Modal, } from 'antd';
+import UserDetail from '../../../common/UserDetail';
+import { Button, Modal, message } from 'antd';
 
 interface album {
     albumId: string,
@@ -39,6 +40,46 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
         {
             title: '罐头数量',
             dataIndex: 'count',
+            render: (dom, album) => {
+                return (
+                    <>
+                        <a onClick={
+                            () => {
+                                const list = albumMap.get(album.albumId) || [];
+                                if (list.length > 0) {
+                                    setAlbumDetailModal(true);
+                                    setDiaryList(list);
+                                } else {
+                                    message.error("暂无罐头可查看~");
+                                }
+                            }
+                        }>
+                            {album.count}
+                        </a>
+                        <Modal
+                            title={diaryList.length}
+                            width={'80%'}
+                            open={albumDetailModal}
+                            onCancel={() => { setAlbumDetailModal(false); setDiaryList([]); }}
+                            footer={[
+                                <Button
+                                    onClick={() => {
+                                        setAlbumDetailModal(false);
+                                        setDiaryList([]);
+                                        deleteAlbumList(diaryList[0].album.id);
+                                    }}
+                                >
+                                    清空
+                                </Button>,
+                            ]}
+                        >
+                            <DiaryList
+                                diaryList={diaryList}
+                            />
+                        </Modal>
+                    </>
+                );
+            },
             width: '40%',
         },
         {
@@ -46,37 +87,7 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
             dataIndex: 'option',
             valueType: 'option',
             render: (dom, album) => [
-                <>
-                    <a onClick={
-                        () => {
-                            setAlbumDetailModal(true);
-                            setDiaryList(albumMap.get(album.albumId) || []);
-                        }
-                    }>
-                        详情
-                    </a>
-                    <Modal
-                        title={diaryList.length}
-                        width={'80%'}
-                        open={albumDetailModal}
-                        onCancel={() => { setAlbumDetailModal(false); setDiaryList([]); }}
-                        footer={[
-                            <Button
-                                onClick={() => {
-                                    setAlbumDetailModal(false);
-                                    setDiaryList([]);
-                                    deleteAlbumList(album.albumId);
-                                }}
-                            >
-                                清空
-                            </Button>,
-                        ]}
-                    >
-                        <DiaryList
-                            diaryList={diaryList}
-                        />
-                    </Modal>
-                </>,
+                <UserDetail userId={album.uid} title="真身" />,
                 <a onClick={() => { deleteAlbumList(album.albumId); }}>
                     删除
                 </a>,
