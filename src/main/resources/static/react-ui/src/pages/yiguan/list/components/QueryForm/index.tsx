@@ -20,15 +20,13 @@ type QueryParams = {
 }
 
 interface QueryFormProps {
-    diaryList: Diary[];
-    setList: (list: Diary[]) => void;
     removeDiaryList: (count: number) => void;
     other: JSX.Element
 }
 
 const FormItem = Form.Item;
 
-const QueryForm: React.FC<QueryFormProps> = ({ diaryList, setList, removeDiaryList, other }) => {
+const QueryForm: React.FC<QueryFormProps> = ({ removeDiaryList, other }) => {
 
     const { initialState } = useModel('@@initialState');
 

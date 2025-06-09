@@ -13,6 +13,8 @@ import { SyncOutlined } from '@ant-design/icons';
 import type { FC } from 'react';
 import React, { useState, useEffect, useRef } from 'react';
 import QueryForm from './components/QueryForm';
+import AlbumList from './components/AlbumList';
+import SUserList from './components/SUserList';
 import DiaryList from '../common/DiaryList';
 import StandardFormRow from '../common/StandardFormRow';
 import ExportForm from './components/ExportForm';
@@ -37,12 +39,16 @@ const contentStyle: React.CSSProperties = {
 const List: FC = () => {
 
   const { loading } = useModel('@@initialState');
-  const { list, setList,
-    sUseList, setSUseList,
-    albumList, setAlbumList,
+  const {
+    list, setList,
+    getSUserMap, updateSUserMap,
+    getAlbumMap, updateAlbumMap,
     lastScore,
     background, setBackground,
   } = useModel('yiguan.model');
+
+  const [albumMap, setAlbumMap] = useState<Map<string, Diary[]>>(getAlbumMap());
+  const [suserMap, setSUserMap] = useState<Map<string, Diary[]>>(getSUserMap());
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -55,21 +61,23 @@ const List: FC = () => {
         const data = res.data;
         if (data.diaries.length > 0) {
           lastScore.current = data.lastScore;
-          let sUsers: Diary[] = [];
-          let albums: Diary[] = [];
           data.diaries.forEach((diary: Diary) => {
             if (diary.isSUser) {
-              sUsers.push(diary);
+              setSUserMap(prevMap => {
+                const newMap = new Map(prevMap);
+                const currentList = newMap.get(diary.user.id) || [];
+                newMap.set(diary.user.id, [...currentList, diary]);
+                return newMap;
+              });
             } else if (diary.album && !diary.user.avatar) { // 专辑太多了，所以只看匿名张专辑
-              albums.push(diary);
+              setAlbumMap(prevMap => {
+                const newMap = new Map(prevMap);
+                const currentList = newMap.get(diary.album.id) || [];
+                newMap.set(diary.album.id, [...currentList, diary]);
+                return newMap;
+              });
             }
           })
-          if (sUsers.length > 0) {
-            setSUseList(sUseList.concat(sUsers));
-          }
-          if (albums.length > 0) {
-            setAlbumList(albumList.concat(albums));
-          }
           setList(list.concat(data.diaries));
           messageApi.success(`新增罐头${data.diaries.length}个，当前共${data.diaries.length + list.length}个!`);
         }
@@ -80,6 +88,8 @@ const List: FC = () => {
   const backgroundRef = useRef(background);
 
   useEffect(() => {
+    setAlbumMap(getAlbumMap());
+    setSUserMap(getSUserMap());
     if (backgroundRef.current) {
       // 关闭后台查询任务
       stopBackgroundQueryScheduler();
@@ -92,6 +102,11 @@ const List: FC = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    updateAlbumMap(albumMap);
+    updateSUserMap(suserMap);
+  }, [albumMap, suserMap]);
 
   function startBackgroundQueryScheduler() {
     request('/yiguan/startBackgroundQueryScheduler', {
@@ -132,25 +147,6 @@ const List: FC = () => {
     reader.readAsText(file);
   }
 
-  function cleanDiary(SUserDiaryIndex: number, albumDiaryIndex: number) {
-    if (SUserDiaryIndex >= 0 || albumDiaryIndex >= 0) {
-      for (let n = 0; n < list.length; n++) {
-        if (SUserDiaryIndex >= 0) {
-          if (list[n].id == sUseList[SUserDiaryIndex].id) {
-            setList(list.slice(n));
-            break;
-          }
-        }
-        if (albumDiaryIndex >= 0) {
-          if (list[n].id == albumList[albumDiaryIndex].id) {
-            setList(list.slice(n));
-            break;
-          }
-        }
-      }
-    }
-  }
-
   const saveCallBack: any = useRef();
   useEffect(() => {
     saveCallBack.current = appendData;
@@ -168,9 +164,6 @@ const List: FC = () => {
     };
   }, [time]);
 
-  const [sUserModal, setSUserModal] = useState(false);
-  const [albumModal, setAlbumModal] = useState(false);
-
   if (loading) {
     return <div />;
   }
@@ -179,12 +172,10 @@ const List: FC = () => {
     <>
       {contextHolder}
       <QueryForm
-        diaryList={list}
-        setList={setList}
         removeDiaryList={(count) => { setList(list.slice(count)); }}
         other={
           <StandardFormRow title="其它选项" grid last>
-            <span>当前总数：{list.length}，S：{sUseList.length}，专辑：{albumList.length}。</span>
+            <span>当前总数：{list.length}，S：{suserMap.size}，专辑：{albumMap.size}。</span>
             <SyncOutlined spin style={{ color: '#1677ff' }} />
             <InputNumber
               min={0.1}
@@ -196,67 +187,14 @@ const List: FC = () => {
               changeOnWheel
               suffix="秒"
             />
-            <Button style={{ "margin": '0 10px 0 10px' }} onClick={() => { setSUserModal(true) }}>
-              S
-            </Button>
-            <Modal
-              title={sUseList.length}
-              width={'80%'}
-              open={sUserModal}
-              onCancel={() => { setSUserModal(false) }}
-              footer={[
-                <Button onClick={() => { cleanDiary(-1, albumList.length - 1); setSUseList([]); }}>
-                  清空
-                </Button>,
-              ]}
-            >
-              <DiaryList
-                diaryList={sUseList}
-                removeDiaryList={(count) => {
-                  cleanDiary(count - 1, albumList.length - 1);
-                  setSUseList(sUseList.slice(count));
-                }}
-              />
-            </Modal>
-            <Button style={{ "margin": '0 10px 0 10px' }} onClick={() => { setAlbumModal(true) }}>
-              匿名专辑
-            </Button>
-            <Modal
-              title={albumList.length}
-              width={'80%'}
-              open={albumModal}
-              onCancel={() => { setAlbumModal(false) }}
-              footer={[
-                <Button onClick={() => { cleanDiary(sUseList.length - 1, - 1); setAlbumList([]); }}>
-                  清空
-                </Button>,
-              ]}
-            >
-              <DiaryList
-                diaryList={albumList}
-                removeDiaryList={(count) => {
-                  cleanDiary(sUseList.length - 1, count - 1);
-                  setAlbumList(albumList.slice(count));
-                }}
-                extActions={(diary, index) => {
-                  const actions: React.ReactNode[] = [];
-                  actions.push(
-                    <Button danger onClick={
-                      () => {
-                        setAlbumList(albumList.filter(albumDiary => diary.album.id != albumDiary.album.id));
-                      }
-                    }>删除专辑</Button>
-                  );
-                  return actions;
-                }}
-              />
-            </Modal>
+            <SUserList suserMap={suserMap} setSUserMap={setSUserMap} />
+            <AlbumList albumMap={albumMap} setAlbumMap={setAlbumMap} />
             <FollowDiaryList />
             <Button
               style={{ "margin": '0 10px 0 10px' }}
               onClick={() => {
-                setSUseList([]);
-                setAlbumList([]);
+                setSUserMap(new Map());
+                setAlbumMap(new Map());
                 setList([]);
               }}
             >
@@ -288,21 +226,6 @@ const List: FC = () => {
         <DiaryList
           diaryList={list}
           removeDiaryList={(count) => {
-            let i = 0, j = 0;
-            for (let n = 0; n < count; n++) {
-              if (sUseList.length > i && list[n].id == sUseList[i].id) {
-                i++;
-              }
-              if (albumList.length > j && list[n].id == albumList[j].id) {
-                j++;
-              }
-            }
-            if (i > 0) {
-              setSUseList(sUseList.slice(i));
-            }
-            if (j > 0) {
-              setAlbumList(albumList.slice(j));
-            }
             setList(list.slice(count));
           }}
         />

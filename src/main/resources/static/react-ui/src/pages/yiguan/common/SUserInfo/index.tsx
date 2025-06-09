@@ -3,7 +3,6 @@ import { Tooltip, message, Tag } from 'antd';
 import { SUser } from '../data';
 import PhotoCarousel from '../PhotoCarousel';
 import UserDetail from '../UserDetail';
-import AlbumDetail from '../AlbumDetail';
 import { request } from '@umijs/max';
 import {
     ModalForm,

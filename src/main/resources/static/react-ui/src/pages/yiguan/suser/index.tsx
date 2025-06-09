@@ -74,7 +74,7 @@ const SUserList: React.FC = () => {
         <>
             <GenericTable<SUser>
                 columns={columns}
-                url='/yiguan/listSUsersPage'
+                requestUrl='/yiguan/listSUsersPage'
                 title='SUser 表格'
                 rowKey='uid'
                 toolBarRender={false}

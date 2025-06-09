@@ -1,11 +1,19 @@
 import { Diary, Mood } from './common/data';
-import { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useModel } from 'umi';
 
 export default function Page() {
     const [list, setList] = useState<Diary[]>([]);
-    const [sUseList, setSUseList] = useState<Diary[]>([]);
-    const [albumList, setAlbumList] = useState<Diary[]>([]);
+    const [suserMap, setSUserMap] = useState<Map<string, Diary[]>>(new Map());
+    const [albumMap, setAlbumMap] = useState<Map<string, Diary[]>>(new Map());
+
+    // let suserMap: Map<string, Diary[]> = new Map();
+    const getSUserMap = () => suserMap;
+    const updateSUserMap = useCallback((newMap: Map<string, Diary[]>) => setSUserMap(new Map(newMap)), []);
+    // let albumMap: Map<string, Diary[]> = new Map();
+    const getAlbumMap = () => albumMap;
+    const updateAlbumMap = (newMap: Map<string, Diary[]>) => { setAlbumMap(new Map(newMap)) };
+
     const lastScore = useRef(0);
 
     const [background, setBackground] = useState(true);
@@ -30,8 +38,8 @@ export default function Page() {
 
     return {
         list, setList,
-        sUseList, setSUseList,
-        albumList, setAlbumList,
+        getSUserMap, updateSUserMap,
+        getAlbumMap, updateAlbumMap,
         lastScore,
         background, setBackground,
         initialQueryParams, setInitialQueryParams,

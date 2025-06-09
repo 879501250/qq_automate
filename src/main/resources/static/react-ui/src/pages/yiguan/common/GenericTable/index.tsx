@@ -22,7 +22,8 @@ interface TableParams {
 // 表格组件的 Props 类型
 interface GenericTableProps<T> {
     columns: ProColumns<T>[],
-    url: string,
+    requestUrl?: string,
+    data?: any[],
     title?: string,
     rowKey: string,
     initTableParams: TableParams,
@@ -33,7 +34,8 @@ interface GenericTableProps<T> {
 
 const GenericTable = <T extends Record<string, any>>({
     columns,
-    url,
+    requestUrl,
+    data,
     title,
     rowKey,
     initTableParams,
@@ -43,32 +45,37 @@ const GenericTable = <T extends Record<string, any>>({
 }: GenericTableProps<T>) => {
     const actionRef = useRef<ActionType>();
     const [selectedRowsState, setSelectedRows] = useState<T[]>([]);
-    const [data, setData] = useState<T[]>();
+    const [dataSource, setDataSource] = useState<T[]>();
     const [loading, setLoading] = useState(false);
     const [tableParams, setTableParams] = useState<TableParams>(initTableParams);
 
     const fetchData = () => {
         setLoading(true);
-        const params = {
-            pageNo: tableParams?.pagination?.current,
-            pageSize: tableParams?.pagination?.pageSize,
-            sortBy: tableParams.sortField,
-            isAsc: tableParams.sortOrder == 'ascend'
-        }
-        request<PageResult>(url, {
-            params: { ...queryParams, ...params },
-            skipErrorHandler: true,
-        }).then(function (res) {
-            setData(res.list);
-            setLoading(false);
-            setTableParams({
-                ...tableParams,
-                pagination: {
-                    ...tableParams.pagination,
-                    total: res.total,
-                },
+        if (requestUrl) {
+            const params = {
+                pageNo: tableParams?.pagination?.current,
+                pageSize: tableParams?.pagination?.pageSize,
+                sortBy: tableParams.sortField,
+                isAsc: tableParams.sortOrder == 'ascend'
+            }
+            request<PageResult>(requestUrl, {
+                params: { ...queryParams, ...params },
+                skipErrorHandler: true,
+            }).then(function (res) {
+                setDataSource(res.list);
+                setLoading(false);
+                setTableParams({
+                    ...tableParams,
+                    pagination: {
+                        ...tableParams.pagination,
+                        total: res.total,
+                    },
+                });
             });
-        });
+        } else if (data) {
+            setDataSource(data);
+            setLoading(false);
+        }
     };
 
     useEffect(fetchData, [
@@ -77,6 +84,7 @@ const GenericTable = <T extends Record<string, any>>({
         tableParams?.sortOrder,
         tableParams?.sortField,
         JSON.stringify(tableParams.filters),
+        data,
     ]);
 
     const handleTableChange: TableProps<T>['onChange'] = (pagination, filters, sorter) => {
@@ -86,10 +94,9 @@ const GenericTable = <T extends Record<string, any>>({
             sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
             sortField: Array.isArray(sorter) ? undefined : sorter.columnKey,
         });
-
         // `dataSource` is useless since `pageSize` changed
         if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setData([]);
+            setDataSource([]);
         }
     };
 
@@ -125,7 +132,7 @@ const GenericTable = <T extends Record<string, any>>({
                 actionRef={actionRef}
                 rowKey={rowKey}
                 search={search}
-                dataSource={data}
+                dataSource={dataSource}
                 pagination={tableParams.pagination}
                 loading={loading}
                 onChange={handleTableChange}

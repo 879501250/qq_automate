@@ -74,7 +74,7 @@ const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
                 >
                     <GenericTable<Album>
                         columns={columns}
-                        url='/yiguan/listAlbumsByUserIdPage'
+                        requestUrl='/yiguan/listAlbumsByUserIdPage'
                         title='SUser 表格'
                         rowKey='uid'
                         search={false}
