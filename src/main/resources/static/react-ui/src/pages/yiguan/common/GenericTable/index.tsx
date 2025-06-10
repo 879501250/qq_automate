@@ -87,6 +87,16 @@ const GenericTable = <T extends Record<string, any>>({
         data,
     ]);
 
+    useEffect(() => {
+        setTableParams({
+            ...tableParams,
+            pagination: {
+                ...tableParams.pagination,
+                total: dataSource?.length,
+            },
+        });
+    }, [dataSource]);
+
     const handleTableChange: TableProps<T>['onChange'] = (pagination, filters, sorter) => {
         setTableParams({
             pagination,
