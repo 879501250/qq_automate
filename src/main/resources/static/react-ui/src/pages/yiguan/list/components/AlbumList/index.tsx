@@ -25,8 +25,21 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
     const [diaryList, setDiaryList] = useState<Diary[]>([]);
     const [albumModal, setAlbumModal] = useState(false);
     const [albumDetailModal, setAlbumDetailModal] = useState(false);
+    const [albumIndex, setAlbumIndex] = useState<number>(-1);
 
     const columns: ProColumns<album>[] = [
+        {
+            title: '#',
+            dataIndex: 'index',
+            render: (dom, album, index) => {
+                return (
+                    <>{index + 1}</>
+                );
+            },
+            align: 'center',
+            search: false,
+            width: 50,
+        },
         {
             title: '专辑',
             dataIndex: 'albumId',
@@ -35,12 +48,11 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                     <AlbumDetail album={{ id: album.albumId }} title={album.title} uid={album.uid} />
                 );
             },
-            width: '40%',
         },
         {
             title: '罐头数量',
             dataIndex: 'count',
-            render: (dom, album) => {
+            render: (dom, album, index) => {
                 return (
                     <>
                         <a onClick={
@@ -49,6 +61,7 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                                 if (list.length > 0) {
                                     setAlbumDetailModal(true);
                                     setDiaryList(list);
+                                    setAlbumIndex(index);
                                 } else {
                                     message.error("暂无罐头可查看~");
                                 }
@@ -60,17 +73,36 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                             title={diaryList.length}
                             width={'80%'}
                             open={albumDetailModal}
-                            onCancel={() => { setAlbumDetailModal(false); setDiaryList([]); }}
+                            onCancel={() => { setAlbumDetailModal(false); setDiaryList([]); setAlbumIndex(-1); }}
                             footer={[
+                                <Button
+                                    onClick={() => {
+                                        if (albumIndex > -1) {
+                                            if (albumIndex + 1 < albumList.length) {
+                                                setDiaryList(albumMap.get(albumList[albumIndex + 1].albumId) || []);
+                                            } else {
+                                                setDiaryList([]);
+                                                setAlbumDetailModal(false);
+                                                setAlbumIndex(-1);
+                                            }
+                                            deleteAlbumList(albumList[albumIndex].albumId);
+                                        } else {
+                                            message.error('未设置 albumIndex ~');
+                                        }
+                                    }}
+                                >
+                                    下一个
+                                </Button>,
                                 <Button
                                     onClick={() => {
                                         setAlbumDetailModal(false);
                                         setDiaryList([]);
                                         deleteAlbumList(diaryList[0].album.id);
+                                        setAlbumIndex(-1);
                                     }}
                                 >
                                     清空
-                                </Button>,
+                                </Button>
                             ]}
                         >
                             <DiaryList
@@ -80,7 +112,6 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                     </>
                 );
             },
-            width: '40%',
         },
         {
             title: '操作',
@@ -92,7 +123,6 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                     删除
                 </a>,
             ],
-            width: '20%',
         },
     ];
 
@@ -125,7 +155,7 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                 匿名专辑
             </Button>
             <Modal
-                // title={albumList.length}
+                title={'匿名专辑列表：' + albumList.length}
                 width={'80%'}
                 open={albumModal}
                 onCancel={() => { setAlbumModal(false) }}
@@ -139,15 +169,15 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
                     data={albumList}
                     columns={columns}
                     rowKey='albumId'
-                    search={false}
                     toolBarRender={false}
                     initTableParams={{
-                        pagination: {
-                            current: 1,
-                            pageSize: 15,
+                        search: false,
+                        bordered: true,
+                        virtual: true,
+                        scroll: {
+                            x: 140,
+                            y: 500,
                         },
-                        sortField: 'lastActiveTime',
-                        sortOrder: 'descend',
                     }}
                 />
             </Modal>

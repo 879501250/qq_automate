@@ -9,6 +9,18 @@ const SUserList: React.FC = () => {
 
     const columns: ProColumns<SUser>[] = [
         {
+            title: '#',
+            dataIndex: 'index',
+            render: (dom, suser, index) => {
+                return (
+                    <>{index + 1}</>
+                );
+            },
+            align: 'center',
+            search: false,
+            width: 50,
+        },
+        {
             title: '用户id',
             dataIndex: 'uid',
             render: (dom, entity) => {
@@ -75,10 +87,10 @@ const SUserList: React.FC = () => {
             <GenericTable<SUser>
                 columns={columns}
                 requestUrl='/yiguan/listSUsersPage'
-                title='SUser 表格'
                 rowKey='uid'
                 toolBarRender={false}
                 initTableParams={{
+                    title: 'SUser 表格',
                     pagination: {
                         current: 1,
                         pageSize: 15,

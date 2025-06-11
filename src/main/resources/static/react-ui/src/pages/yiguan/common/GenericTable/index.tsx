@@ -13,10 +13,19 @@ import type { SearchConfig } from '@ant-design/pro-table/es/components/Form/Form
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
 
 interface TableParams {
+    title?: string,
+    bordered?: boolean,
     pagination?: TablePaginationConfig;
+    virtual?: boolean,
+    scroll?: {
+        x?: number | true | string;
+        y?: number | string;
+    };
+    search?: false | SearchConfig | undefined,
     sortField?: SorterResult<any>['field'];
     sortOrder?: SorterResult<any>['order'];
     filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
+    rowSelection?: any;
 }
 
 // 表格组件的 Props 类型
@@ -24,11 +33,9 @@ interface GenericTableProps<T> {
     columns: ProColumns<T>[],
     requestUrl?: string,
     data?: any[],
-    title?: string,
     rowKey: string,
     initTableParams: TableParams,
     queryParams?: any,
-    search?: false | SearchConfig | undefined,
     toolBarRender?: ((action: ActionType | undefined, rows: { selectedRowKeys?: (string | number)[] | undefined; selectedRows?: any[] | undefined; }) => React.ReactNode[]) | false;
 }
 
@@ -36,11 +43,9 @@ const GenericTable = <T extends Record<string, any>>({
     columns,
     requestUrl,
     data,
-    title,
     rowKey,
     initTableParams,
     queryParams,
-    search,
     toolBarRender,
 }: GenericTableProps<T>) => {
     const actionRef = useRef<ActionType>();
@@ -136,24 +141,30 @@ const GenericTable = <T extends Record<string, any>>({
     return (
         <>
             <ProTable<any, TableListPagination>
-                headerTitle={title}
+                headerTitle={tableParams.title}
+                bordered={tableParams.bordered}
+                size='large'
+                tableLayout='fixed'
                 toolBarRender={toolBarRender}
                 columnEmptyText={false}
                 actionRef={actionRef}
                 rowKey={rowKey}
-                search={search}
+                search={tableParams.search}
                 dataSource={dataSource}
-                pagination={tableParams.pagination}
+                pagination={tableParams.virtual ? false : tableParams.pagination}
+                virtual={tableParams.virtual}
+                scroll={tableParams.scroll}
                 loading={loading}
                 onChange={handleTableChange}
                 columns={columns}
-                rowSelection={{
-                    onChange: (_, selectedRows) => {
-                        setSelectedRows(selectedRows);
-                    },
-                }}
+                rowSelection={tableParams.rowSelection}
+                // rowSelection={{
+                //     onChange: (_, selectedRows) => {
+                //         setSelectedRows(selectedRows);
+                //     },
+                // }}
             />
-            {selectedRowsState?.length > 0 && (
+            {/* {selectedRowsState?.length > 0 && (
                 <FooterToolbar
                     extra={
                         <div>
@@ -179,7 +190,7 @@ const GenericTable = <T extends Record<string, any>>({
                         批量删除
                     </Button>
                 </FooterToolbar>
-            )}
+            )} */}
         </>
     );
 };

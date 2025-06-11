@@ -75,11 +75,11 @@ const AlbumList: React.FC<{ uid: string }> = ({ uid }) => {
                     <GenericTable<Album>
                         columns={columns}
                         requestUrl='/yiguan/listAlbumsByUserIdPage'
-                        title='SUser 表格'
                         rowKey='uid'
-                        search={false}
                         toolBarRender={false}
                         initTableParams={{
+                            title: 'SUser 表格',
+                            search: false,
                             pagination: {
                                 current: 1,
                                 pageSize: 15,

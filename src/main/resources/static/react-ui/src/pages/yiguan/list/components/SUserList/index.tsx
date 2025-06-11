@@ -24,8 +24,21 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
     const [diaryList, setDiaryList] = useState<Diary[]>([]);
     const [suserModal, setSUserModal] = useState(false);
     const [suserDetailModal, setSuserDetailModal] = useState(false);
+    const [suserIndex, setSUserIndex] = useState<number>(-1);
 
     const columns: ProColumns<suser>[] = [
+        {
+            title: '#',
+            dataIndex: 'index',
+            render: (dom, susser, index) => {
+                return (
+                    <>{index + 1}</>
+                );
+            },
+            align: 'center',
+            search: false,
+            width: 50,
+        },
         {
             title: 'suser',
             dataIndex: 'albumId',
@@ -37,12 +50,11 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                     />
                 );
             },
-            width: '40%',
         },
         {
             title: '罐头数量',
             dataIndex: 'count',
-            render: (dom, suser) => {
+            render: (dom, suser, index) => {
                 return (
                     <>
                         <a onClick={
@@ -51,6 +63,7 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                                 if (list.length > 0) {
                                     setSuserDetailModal(true);
                                     setDiaryList(list);
+                                    setSUserIndex(index);
                                 } else {
                                     message.error("暂无罐头可查看~");
                                 }
@@ -62,17 +75,36 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                             title={diaryList.length}
                             width={'80%'}
                             open={suserDetailModal}
-                            onCancel={() => { setSuserDetailModal(false); setDiaryList([]); }}
+                            onCancel={() => { setSuserDetailModal(false); setDiaryList([]); setSUserIndex(-1); }}
                             footer={[
+                                <Button
+                                    onClick={() => {
+                                        if (suserIndex > -1) {
+                                            if (suserIndex + 1 < suserList.length) {
+                                                setDiaryList(suserMap.get(suserList[suserIndex + 1].uid) || []);
+                                            } else {
+                                                setDiaryList([]);
+                                                setSuserDetailModal(false);
+                                                setSUserIndex(-1);
+                                            }
+                                            deleteSUserList(suserList[suserIndex].uid);
+                                        } else {
+                                            message.error('未设置 albumIndex ~');
+                                        }
+                                    }}
+                                >
+                                    下一个
+                                </Button>,
                                 <Button
                                     onClick={() => {
                                         setSuserDetailModal(false);
                                         setDiaryList([]);
                                         deleteSUserList(diaryList[0].user.id);
+                                        setSUserIndex(-1);
                                     }}
                                 >
                                     清空
-                                </Button>,
+                                </Button>
                             ]}
                         >
                             <DiaryList
@@ -82,7 +114,6 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                     </>
                 );
             },
-            width: '40%',
         },
         {
             title: '操作',
@@ -94,7 +125,6 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                     删除
                 </a>,
             ],
-            width: '20%',
         },
     ];
 
@@ -126,7 +156,7 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                 S
             </Button>
             <Modal
-                // title={albumList.length}
+                title={'suser列表：' + suserList.length}
                 width={'80%'}
                 open={suserModal}
                 onCancel={() => { setSUserModal(false) }}
@@ -140,15 +170,15 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
                     data={suserList}
                     columns={columns}
                     rowKey='uid'
-                    search={false}
                     toolBarRender={false}
                     initTableParams={{
-                        pagination: {
-                            current: 1,
-                            pageSize: 15,
+                        search: false,
+                        bordered: true,
+                        virtual: true,
+                        scroll: {
+                            x: 140,
+                            y: 500,
                         },
-                        sortField: 'lastActiveTime',
-                        sortOrder: 'descend',
                     }}
                 />
             </Modal>
