@@ -11,7 +11,10 @@ interface album {
     albumId: string,
     title: string,
     uid: string,
-    count: number;
+    count: number,
+    diaryNum: number,
+    followNum: number,
+    createTime: string,
 }
 
 interface Props {
@@ -38,7 +41,7 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
             },
             align: 'center',
             search: false,
-            width: 50,
+            width: 70,
         },
         {
             title: '专辑',
@@ -114,6 +117,18 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
             },
         },
         {
+            title: '关注人数',
+            dataIndex: 'followNum',
+        },
+        {
+            title: '创建时间',
+            dataIndex: 'createTime',
+        },
+        {
+            title: '罐头总数量',
+            dataIndex: 'diaryNum',
+        },
+        {
             title: '操作',
             dataIndex: 'option',
             valueType: 'option',
@@ -138,11 +153,15 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
     useEffect(() => {
         let albums: album[] = [];
         for (const [key, value] of albumMap) {
+            console.log(value)
             albums.push({
                 albumId: key,
                 title: value[0].album.title || key,
                 uid: value[0].user.id,
                 count: value.length,
+                diaryNum: value[value.length - 1].album.diaryNum || 0,
+                followNum: value[value.length - 1].album.followNum || 0,
+                createTime: value[0].album.createTime || '',
             })
         }
         setAlbumList(albums);

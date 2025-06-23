@@ -37,7 +37,7 @@ const SUserList: React.FC<Props> = ({ suserMap, setSUserMap }) => {
             },
             align: 'center',
             search: false,
-            width: 50,
+            width: 70,
         },
         {
             title: 'suser',
