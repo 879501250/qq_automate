@@ -153,7 +153,6 @@ const AlbumList: React.FC<Props> = ({ albumMap, setAlbumMap }) => {
     useEffect(() => {
         let albums: album[] = [];
         for (const [key, value] of albumMap) {
-            console.log(value)
             albums.push({
                 albumId: key,
                 title: value[0].album.title || key,

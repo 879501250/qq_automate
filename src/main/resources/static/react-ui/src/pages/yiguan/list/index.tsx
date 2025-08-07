@@ -52,6 +52,8 @@ const List: FC = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
+  const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+
   const appendData = () => {
     request('/yiguan/listNew', {
       params: { 'lastScore': lastScore.current, },
@@ -70,12 +72,17 @@ const List: FC = () => {
                 return newMap;
               });
             } else if (diary.album && !diary.user.avatar) { // 专辑太多了，所以只看匿名张专辑
-              setAlbumMap(prevMap => {
-                const newMap = new Map(prevMap);
-                const currentList = newMap.get(diary.album.id) || [];
-                newMap.set(diary.album.id, [...currentList, diary]);
-                return newMap;
-              });
+              // 单纯的匿名专辑也太多了，只看关注数>罐头数和最近30天新建的罐头
+              if (albumMap.get(diary.album.id) != null
+                || (diary.album.followNum || 0) >= (diary.album.diaryNum || 0)
+                || Date.now() - thirtyDaysInMs < new Date(diary.album.createTime || Date.now()).getTime()) {
+                setAlbumMap(prevMap => {
+                  const newMap = new Map(prevMap);
+                  const currentList = newMap.get(diary.album.id) || [];
+                  newMap.set(diary.album.id, [...currentList, diary]);
+                  return newMap;
+                });
+              }
             }
           })
           setList(list.concat(data.diaries));
