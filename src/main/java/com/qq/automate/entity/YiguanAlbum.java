@@ -41,6 +41,12 @@ public class YiguanAlbum implements Serializable {
     private String uid;
 
     /**
+     * 专辑背景
+     */
+    @TableField("photo")
+    private String photo;
+
+    /**
      * 专辑标题
      */
     @TableField("album_title")

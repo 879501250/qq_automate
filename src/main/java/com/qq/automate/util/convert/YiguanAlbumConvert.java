@@ -15,6 +15,7 @@ public interface YiguanAlbumConvert {
 
     @Mappings({
             @Mapping(source = "albumId", target = "id"),
+            @Mapping(source = "photo", target = "photo"),
             @Mapping(source = "albumTitle", target = "title"),
             @Mapping(source = "updateTime", target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss"),
             @Mapping(source = "createTime", target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss"),

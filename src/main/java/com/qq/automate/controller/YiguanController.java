@@ -115,5 +115,9 @@ public class YiguanController {
     public PageResult<YiguanAlbumVO> listAlbumsByUserIdPage(YiguanAlbumQuery query) {
         return yiguanAlbumService.listAlbumsByUserIdPage(query);
     }
+    @GetMapping("/getAlbumDetail")
+    public Result getAlbumDetail(String albumId) {
+        return yiguanAlbumService.getAlbumDetail(albumId);
+    }
 
 }

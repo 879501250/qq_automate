@@ -74,6 +74,21 @@ const AlbumDetail: React.FC<{ album: Album, title: string, uid: string }> = ({ a
                         setLoad(false);
                     } else {
                         message.error(res.msg);
+                        if (res.msg == '专辑已过期') {
+                            request("/yiguan/getAlbumDetail", {
+                                params: { 'albumId': album.id },
+                                skipErrorHandler: true,
+                            }).then(function (res) {
+                                if (res.code == 1) {
+                                    console.log(res);
+                                    setAlbumDetail(res.data);
+                                    album.photo = res.data.photo;
+                                    setLoad(false);
+                                } else {
+                                    message.error(res.message);
+                                }
+                            });
+                        }
                     }
                 });
             } else {

@@ -13,4 +13,6 @@ public interface YiguanAlbumService extends IService<YiguanAlbum> {
     Result insertOrUpdateAlbum(YiguanAlbum album);
 
     PageResult<YiguanAlbumVO> listAlbumsByUserIdPage(YiguanAlbumQuery query);
+
+    Result getAlbumDetail(String albumId);
 }

@@ -102,6 +102,7 @@ public class YiguanServiceImpl implements YiguanService {
             YiguanAlbum yiguanAlbum = new YiguanAlbum();
             yiguanAlbum.setAlbumId(album.getStr("id"));
             yiguanAlbum.setUid(album.getStr("uid"));
+            yiguanAlbum.setPhoto(album.getStr("photo"));
             yiguanAlbum.setAlbumTitle(album.getStr("title"));
             yiguanAlbum.setDiaryNum(album.getInt("diaryNum"));
             yiguanAlbum.setFollowNum(album.getInt("followNum"));

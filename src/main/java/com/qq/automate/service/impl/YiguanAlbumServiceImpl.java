@@ -34,6 +34,15 @@ public class YiguanAlbumServiceImpl extends ServiceImpl<YiguanAlbumMapper, Yigua
     }
 
     @Override
+    public Result getAlbumDetail(String albumId) {
+        YiguanAlbum yiguanAlbum = yiguanAlbumMapper.selectById(albumId);
+        if (yiguanAlbum == null) {
+            return Result.error().message("未查询到专辑[" + albumId + "]~");
+        }
+        return Result.success().data(yiguanAlbumConvert.albumToAlbumVO(yiguanAlbum));
+    }
+
+    @Override
     public Result insertOrUpdateAlbum(YiguanAlbum album) {
         return new Result().success(yiguanAlbumMapper.insertOrUpdate(album));
     }
